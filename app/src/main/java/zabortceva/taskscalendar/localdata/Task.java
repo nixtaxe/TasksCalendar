@@ -8,58 +8,70 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 @Entity(tableName = "task_table")
 public class Task {
 
     @PrimaryKey(autoGenerate = true)
     @NonNull
-    private int id;
+    @Expose
+    private Long id;
 
     //Название задачи
     @NonNull
+    @Expose
     private String name;
 
     //Описание задачи
     @Nullable
+    @Expose
     private String details;
 
     @NonNull
-    private char status = 'q';
+    @Expose
+    private String status = "q";
 
     @Nullable
-    private int event_id;
+    @Expose
+    private Long event_id;
 
     @Nullable
-    private int parent_id;
+    @Expose
+    private Long parent_id;
 
     @NonNull
+    @Expose
     @TypeConverters({TimestampConverters.class})
-    private Timestamp deadline_at;
+    private Long deadline_at;
 
     @NonNull
+    @Expose
     @TypeConverters({TimestampConverters.class})
-    private Timestamp created_at;
+    private Long created_at;
 
     @Nullable
+    @Expose
     @TypeConverters({TimestampConverters.class})
-    private Timestamp updated_at;
+    private Long updated_at;
 
     public Task(String name, String details, Timestamp deadline_at) {
         this.name = name;
         this.details = details;
-        this.deadline_at = deadline_at;
-        this.created_at = new Timestamp(System.currentTimeMillis());
+        this.deadline_at = deadline_at.getTime();
+        this.created_at = System.currentTimeMillis();
     }
 
     public Task() {
-        this.id = 0;
+        this.id = 0L;
         this.name = "";
         this.details = "";
-        this.event_id = 0;
-        this.parent_id = 0;
-        this.deadline_at = new Timestamp(System.currentTimeMillis());
-        this.created_at = new Timestamp(System.currentTimeMillis());
-        this.updated_at = new Timestamp(System.currentTimeMillis());
+        this.event_id = 0L;
+        this.parent_id = 0L;
+        this.deadline_at = System.currentTimeMillis();
+        this.created_at = System.currentTimeMillis();
+        this.updated_at = System.currentTimeMillis();
     }
 
     @Override
@@ -73,7 +85,7 @@ public class Task {
                 '}';
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
@@ -85,31 +97,31 @@ public class Task {
         return details;
     }
 
-    public char getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public int getEvent_id() {
+    public Long getEvent_id() {
         return event_id;
     }
 
-    public int getParent_id() {
+    public Long getParent_id() {
         return parent_id;
     }
 
-    public Timestamp getDeadline_at() {
+    public Long getDeadline_at() {
         return deadline_at;
     }
 
-    public Timestamp getCreated_at() {
+    public Long getCreated_at() {
         return created_at;
     }
 
-    public Timestamp getUpdated_at() {
+    public Long getUpdated_at() {
         return updated_at;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -121,27 +133,27 @@ public class Task {
         this.details = details;
     }
 
-    public void setStatus(char status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
-    public void setEvent_id(int event_id) {
+    public void setEvent_id(Long event_id) {
         this.event_id = event_id;
     }
 
-    public void setParent_id(int parent_id) {
+    public void setParent_id(Long parent_id) {
         this.parent_id = parent_id;
     }
 
-    public void setDeadline_at(Timestamp deadline_at) {
+    public void setDeadline_at(Long deadline_at) {
         this.deadline_at = deadline_at;
     }
 
-    public void setCreated_at(Timestamp created_at) {
+    public void setCreated_at(Long created_at) {
         this.created_at = created_at;
     }
 
-    public void setUpdated_at(Timestamp updated_at) {
+    public void setUpdated_at(Long updated_at) {
         this.updated_at = updated_at;
     }
 }

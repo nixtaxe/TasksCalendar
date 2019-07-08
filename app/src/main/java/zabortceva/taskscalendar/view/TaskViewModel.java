@@ -11,10 +11,12 @@ import java.util.List;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import zabortceva.taskscalendar.localdata.Task;
+import zabortceva.taskscalendar.repository.CalendarRepository;
 import zabortceva.taskscalendar.repository.SQLiteCalendarRepository;
+import zabortceva.taskscalendar.repository.WebCalendarRepository;
 
 public class TaskViewModel extends AndroidViewModel {
-    private SQLiteCalendarRepository repository;
+    private CalendarRepository repository;
     private LiveData<List<Task>> allTasks;
     private LiveData<List<Task>> dayTasks;
     private Date selectedDay;
@@ -23,7 +25,7 @@ public class TaskViewModel extends AndroidViewModel {
     public TaskViewModel(Application application) {
         super(application);
 
-        repository = new SQLiteCalendarRepository(application);
+        repository = new WebCalendarRepository(application);
         allTasks = repository.getAllTasks();
         selectedDay = new Date(System.currentTimeMillis());
         busyDays = repository.getAllBusyDays();
