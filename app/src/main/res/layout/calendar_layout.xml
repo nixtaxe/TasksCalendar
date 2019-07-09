@@ -21,6 +21,24 @@
         android:layout_above="@id/add_task_button"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/view_account_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_account"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@+id/view_events_button"
+        android:layout_margin="8dp"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/view_events_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_events"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@+id/add_task_button"
+        android:layout_margin="8dp"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_task_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -29,5 +47,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_margin="8dp"/>
+
+
 
 </RelativeLayout>

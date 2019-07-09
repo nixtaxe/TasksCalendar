@@ -10,8 +10,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -20,10 +22,12 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class AddEditTaskActivity extends AppCompatActivity {
 
+    public static final String EXTRA_TASK_EVENTS_NAME = "zabortceva.taskscalendar.EXTRA_TASK_EVENTS_NAME";
     public static final String EXTRA_TASK_ID = "zabortceva.taskscalendar.EXTRA_TASK_ID";
     public static final String EXTRA_TASK_NAME = "zabortceva.taskscalendar.EXTRA_TASK_NAME";
     public static final String EXTRA_TASK_DETAILS = "zabortceva.taskscalendar.EXTRA_TASK_DETAILS";
@@ -37,6 +41,8 @@ public class AddEditTaskActivity extends AppCompatActivity {
 
     public static final int PICK_DEADLINE_DAY_REQUEST = 1;
 
+    private ArrayList<String> eventsName;
+    private Spinner events;
     private EditText editTaskName;
     private EditText editTaskDetails;
     private TextView editDeadlineAtDay;
@@ -121,6 +127,14 @@ public class AddEditTaskActivity extends AppCompatActivity {
                 saveTask();
             }
         });
+
+        events = (Spinner) findViewById(R.id.events);
+        eventsName = intent.getStringArrayListExtra(EXTRA_TASK_EVENTS_NAME);
+
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, eventsName);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        events.setAdapter(dataAdapter);
     }
 
     private void saveTask() {

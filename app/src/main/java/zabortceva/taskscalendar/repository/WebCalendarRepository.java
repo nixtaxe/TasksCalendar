@@ -35,21 +35,34 @@ import zabortceva.taskscalendar.serverdata.Tasks;
 
 public class WebCalendarRepository implements CalendarRepository {
     private Retrofit serverDatabase;
+    
     private TasksApi tasksApi;
+//    final private MutableLiveData<List<Task>> allTasks;
+//    final private MutableLiveData<List<Task>> dayTasks;
+//    final private MutableLiveData<List<CalendarDay>> busyDays;
+//    private Date selectedDay;
+
     private EventsApi eventsApi;
-    private LiveData<List<Task>> allTasks;
-    private LiveData<List<Task>> dayTasks;
-    private LiveData<List<CalendarDay>> busyDays;
-    private Date selectedDay;
+//    final private MutableLiveData<List<Event>> allEvents;
 
     public WebCalendarRepository(Application app) {
         serverDatabase = ServerDatabase.getInstance();
         tasksApi = ServerDatabase.getTasksTable();
         eventsApi = ServerDatabase.getEventsTable();
-        allTasks = null;//tasksApi.getAllTasks();
-        busyDays = null;//taskDao.getAllBusyDays();
-        selectedDay = new Date(System.currentTimeMillis());
-        dayTasks = null;//tasksApi.getDayTasks(0);//taskDao.getDayTasks(new Timestamp(selectedDay.getTime()));
+//        allTasks = new MutableLiveData<>();//tasksApi.getAllTasks();
+//        busyDays = new MutableLiveData<>();//taskDao.getAllBusyDays();
+//
+//        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+//        selectedDay = new Date();
+//        try {
+//            selectedDay = formatter.parse(formatter.format(System.currentTimeMillis()));
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+//
+//        dayTasks = new MutableLiveData<>();//tasksApi.getDayTasks(0);//taskDao.getDayTasks(new Timestamp(selectedDay.getTime()));
+//
+//        allEvents = new MutableLiveData<>();
     }
 
     @Override
@@ -75,6 +88,29 @@ public class WebCalendarRepository implements CalendarRepository {
     @Override
     public void deleteTask(Task task) {
 
+    }
+
+    @Override
+    public LiveData<List<Event>> getAllEvents() {
+        final MutableLiveData<List<Event>> data = new MutableLiveData<>();
+
+        eventsApi.getAllEvents(1000).enqueue(new Callback<Events>() {
+            @Override
+            public void onResponse(Call<Events> call, Response<Events> response) {
+                if (response.body() != null)
+                    data.setValue(Arrays.asList(response.body().getData()));
+                else {
+                    Log.v("GetAllEvents", "Null");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Events> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
+
+        return data;
     }
 
     public LiveData<List<Event>> getDayEvents(Timestamp day) {
@@ -154,63 +190,6 @@ public class WebCalendarRepository implements CalendarRepository {
                 t.printStackTrace();
             }
         });
-
-//        //try to get by interval
-//        eventsApi.getAllEvents(1000).enqueue(new Callback<Events>() {
-//            @Override
-//            public void onResponse(Call<Events> call, Response<Events> response) {
-//                if (response.body() != null) {
-//                    final MutableLiveData<List<Task>> tasks = new MutableLiveData<>();
-//                    List<Task> result = new ArrayList<>();
-//                    for (Event event : response.body().getData()) {
-//                        tasksApi.getEventTasks(event.getId()).enqueue(new Callback<Tasks>() {
-//                            @Override
-//                            public void onResponse(Call<Tasks> call, Response<Tasks> response) {
-//                                if (response.body() != null) {
-//                                    List<Task> list = new ArrayList<>();
-//                                    for (Task task : response.body().getData()) {
-//                                        if (task.getDeadline_at() <= endOfDay && task.getDeadline_at() >= startOfDay) {
-//                                            list.add(task);
-//                                        }
-//                                    }
-//                                    tasks.setValue(list);
-//                                } else {
-//                                    Log.v("GetEventTasks", "Null");
-//                                }
-//                            }
-//
-//                            @Override
-//                            public void onFailure(Call<Tasks> call, Throwable t) {
-//                                t.printStackTrace();
-//                            }
-//                        });
-//                        tasks.observeForever(null, new Observer<List<Task>>() {
-//                            @Override
-//                            public void onChanged(List<Task> tasks) {
-//                                result.addAll(tasks.getValue());
-//                                Collections.sort(result, new Comparator<Task>() {
-//                                    @Override
-//                                    public int compare(Task lhs, Task rhs) {
-//                                        // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
-//                                        return lhs.getDeadline_at() < rhs.getDeadline_at() ? -1 : (lhs.getDeadline_at() > rhs.getDeadline_at()) ? 1 : 0;
-//                                    }
-//                                });
-//                            }
-//                        });
-//
-//
-//                    }
-//                    data.setValue(result);
-//                } else {
-//                    Log.v("GetDayTasks", "Null");
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<Events> call, Throwable t) {
-//                t.printStackTrace();
-//            }
-//        });
 
         return data;
     }

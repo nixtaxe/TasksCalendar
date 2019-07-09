@@ -10,9 +10,10 @@ import java.util.List;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+
 import zabortceva.taskscalendar.localdata.Task;
 import zabortceva.taskscalendar.repository.CalendarRepository;
-import zabortceva.taskscalendar.repository.SQLiteCalendarRepository;
 import zabortceva.taskscalendar.repository.WebCalendarRepository;
 
 public class TaskViewModel extends AndroidViewModel {
@@ -33,10 +34,12 @@ public class TaskViewModel extends AndroidViewModel {
 
     public void insert(Task task) {
         repository.insertTask(task);
+        getDayTasks(new Timestamp(selectedDay.getTime()));
     }
 
     public void update(Task task) {
         repository.updateTask(task);
+        getDayTasks(new Timestamp(selectedDay.getTime()));
     }
 
     public void delete(Task task) {

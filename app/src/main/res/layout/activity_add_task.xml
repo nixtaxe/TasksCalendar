@@ -24,6 +24,11 @@
         android:padding="16dp"
         android:layout_above="@id/save_task_button">
 
+        <Spinner
+            android:id="@+id/events"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <EditText
             android:id="@+id/edit_task_name"
             android:layout_width="match_parent"

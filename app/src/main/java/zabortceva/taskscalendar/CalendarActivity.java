@@ -28,6 +28,8 @@ import java.util.HashSet;
 import java.util.List;
 
 import androidx.lifecycle.ViewModelProviders;
+
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.prolificinteractive.materialcalendarview.CalendarDay;
@@ -37,7 +39,9 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.prolificinteractive.materialcalendarview.spans.DotSpan;
 
+import zabortceva.taskscalendar.localdata.Event;
 import zabortceva.taskscalendar.localdata.Task;
+import zabortceva.taskscalendar.view.EventViewModel;
 import zabortceva.taskscalendar.view.TaskViewModel;
 import zabortceva.taskscalendar.view.TasksAdapter;
 import zabortceva.taskscalendar.view.AlertReceiver;
@@ -50,7 +54,7 @@ public class CalendarActivity extends AppCompatActivity {
     //TODO adjust insertion into table
 
     //TODO figure out how to implement events and users
-
+    private ArrayList<String> events;
     private MaterialCalendarView calendarView;
     private RecyclerView tasksView;
     private FloatingActionButton addTaskButton;
@@ -59,6 +63,7 @@ public class CalendarActivity extends AppCompatActivity {
     private EventDecorator busyDaysDecorator = new EventDecorator(0, new ArrayList<CalendarDay>());
 
     private TaskViewModel taskViewModel;
+    private EventViewModel eventViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -137,6 +142,7 @@ public class CalendarActivity extends AppCompatActivity {
             public void onItemClick(Task task) {
                 Intent intent = new Intent(CalendarActivity.this, AddEditTaskActivity.class);
 
+                intent.putStringArrayListExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME, events);
                 intent.putExtra(AddEditTaskActivity.EXTRA_TASK_ID, task.getId());
                 intent.putExtra(AddEditTaskActivity.EXTRA_TASK_NAME, task.getName());
                 intent.putExtra(AddEditTaskActivity.EXTRA_TASK_DETAILS, task.getDetails());
@@ -170,10 +176,24 @@ public class CalendarActivity extends AppCompatActivity {
 
                 Timestamp dateTime = new Timestamp(calendarView.getSelectedDate().getDate().getTime());
                 intent.putExtra(AddEditTaskActivity.EXTRA_TASK_DEADLINE_AT, dateTime.toString());
+                intent.putStringArrayListExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME, events);
 
                 startActivityForResult(intent, ADD_TASK_REQUEST);
             }
         });
+
+        eventViewModel = ViewModelProviders.of(this).get(EventViewModel.class);
+        events = new ArrayList<>();
+        eventViewModel.getAllEvents().observe(this, new Observer<List<Event>>() {
+            @Override
+            public void onChanged(List<Event> new_events) {
+                events.clear();
+                for (Event event : new_events) {
+                    events.add(event.getName());
+                }
+            }
+        });
+
     }
 
     private void observeNewDay(Timestamp timestamp) {

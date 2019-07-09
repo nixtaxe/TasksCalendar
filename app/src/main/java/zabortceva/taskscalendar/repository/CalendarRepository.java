@@ -6,7 +6,9 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
+import zabortceva.taskscalendar.localdata.Event;
 import zabortceva.taskscalendar.localdata.Task;
 
 public interface CalendarRepository {
@@ -21,4 +23,6 @@ public interface CalendarRepository {
     public LiveData<List<Task>> getAllTasks();
 
     public LiveData<List<CalendarDay>> getAllBusyDays();
+
+    public LiveData<List<Event>> getAllEvents();
 }
