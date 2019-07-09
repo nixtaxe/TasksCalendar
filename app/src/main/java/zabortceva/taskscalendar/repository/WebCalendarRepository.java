@@ -243,4 +243,27 @@ public class WebCalendarRepository implements CalendarRepository {
 
         return data;
     }
+
+    @Override
+    public LiveData<Events> insertEvent(Event event) {
+        final MutableLiveData<Events> data = new MutableLiveData<>();
+
+        eventsApi.insert(event).enqueue(new Callback<Events>() {
+            @Override
+            public void onResponse(Call<Events> call, Response<Events> response) {
+                if (response.body() != null) {
+                    data.setValue(response.body());
+                } else {
+                    Log.v("InsertEvent", "Null");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Events> call, Throwable t) {
+
+            }
+        });
+
+        return data;
+    }
 }

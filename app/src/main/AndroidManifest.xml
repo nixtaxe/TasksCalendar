@@ -19,6 +19,10 @@
 
         <activity android:name=".AddEditTaskActivity"
             android:parentActivityName=".CalendarActivity"/>
+        <activity android:name=".EventsActivity"
+            android:parentActivityName=".CalendarActivity"/>
+        <activity android:name=".AddEditEventActivity"
+            android:parentActivityName=".EventsActivity"/>
         <activity android:name=".CalendarActivity"
             android:launchMode="singleTop">
             <intent-filter>

@@ -58,6 +58,7 @@ public class CalendarActivity extends AppCompatActivity {
     private MaterialCalendarView calendarView;
     private RecyclerView tasksView;
     private FloatingActionButton addTaskButton;
+    private FloatingActionButton viewEventsButton;
     final TasksAdapter tasksAdapter = new TasksAdapter();
     private Observer<List<Task>> dayTasksObserver;
     private EventDecorator busyDaysDecorator = new EventDecorator(0, new ArrayList<CalendarDay>());
@@ -191,6 +192,17 @@ public class CalendarActivity extends AppCompatActivity {
                 for (Event event : new_events) {
                     events.add(event.getName());
                 }
+            }
+        });
+
+        viewEventsButton = findViewById(R.id.view_events_button);
+        viewEventsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(CalendarActivity.this, EventsActivity.class);
+                intent.putStringArrayListExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME, events);
+
+                startActivity(intent);
             }
         });
 

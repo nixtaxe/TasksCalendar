@@ -14,6 +14,7 @@ import java.util.List;
 import zabortceva.taskscalendar.localdata.Event;
 import zabortceva.taskscalendar.repository.CalendarRepository;
 import zabortceva.taskscalendar.repository.WebCalendarRepository;
+import zabortceva.taskscalendar.serverdata.Events;
 
 public class EventViewModel extends AndroidViewModel {
     private CalendarRepository repository;
@@ -30,5 +31,8 @@ public class EventViewModel extends AndroidViewModel {
 
     public LiveData<List<Event>> getAllEvents() {
         return allEvents;
+    }
+    public LiveData<Events> insert(Event event) {
+        return repository.insertEvent(event);
     }
 }
