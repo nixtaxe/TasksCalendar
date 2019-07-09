@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import zabortceva.taskscalendar.requests.EventsApi;
 import zabortceva.taskscalendar.requests.TasksApi;
 
 public abstract class ServerDatabase {
@@ -31,5 +32,9 @@ public abstract class ServerDatabase {
 
     public static TasksApi getTasksTable() {
         return retrofit.create(TasksApi.class);
+    }
+
+    public static EventsApi getEventsTable() {
+        return retrofit.create(EventsApi.class);
     }
 }

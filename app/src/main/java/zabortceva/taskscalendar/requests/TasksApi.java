@@ -8,46 +8,43 @@ import com.prolificinteractive.materialcalendarview.CalendarDay;
 import java.util.List;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import zabortceva.taskscalendar.localdata.CalendarDayConverters;
+import zabortceva.taskscalendar.localdata.Task;
 import zabortceva.taskscalendar.serverdata.Tasks;
 
 public interface TasksApi {
 
-//    @GET("api/v1/tasks/get")
-//    Call<TaskGetResponse> getTask();
-
-    //@Query("SELECT * FROM task_table WHERE date(deadline_at) = date(:day) ORDER BY deadline_at ASC")
     @Headers({
             "X-Firebase-Auth: serega_mem"
     })
-    @GET("api/v1/tasks/{id}")
-    Call<Tasks> getDayTasks(@Path("id") long id);
+    @GET("api/v1/tasks")
+    Call<Tasks> getDayTasks(@Query("id") Long[] id);
 
     @Headers({
             "X-Firebase-Auth: serega_mem"
     })
     @GET("/api/v1/tasks")
-    Call<Tasks> getAllTasks(@Query("event_id") Long id);
+    Call<Tasks> getAllTasks(@Query("count") int count);
 
+    @Headers({
+            "X-Firebase-Auth: serega_mem"
+    })
+    @GET("/api/v1/tasks")
+    Call<Tasks> getEventTasks(@Query("event_id") long id);
 
-//    @TypeConverters(TimestampConverters.class)
-//    @Query("SELECT * FROM task_table WHERE strftime('%d-%m-%Y', deadline_at / 1000, 'unixepoch', 'localtime') " +
-//            " = strftime('%d-%m-%Y', :day / 1000, 'unixepoch', 'localtime') ORDER BY deadline_at ASC")
-//    LiveData<List<Task>> getDayTasks(Timestamp day);
-//
-//    @Query("SELECT * FROM task_table")
-//    LiveData<List<Task>> getAllTasks();
-//
-//@Headers({
-//        "X-Firebase-Auth: serega_mem"
-//})
-//@GET("api/v1/tasks/8")
-//    @TypeConverters(CalendarDayConverters.class)
-//    Call<List<CalendarDay>> getAllBusyDays();
+    @Headers({
+            "Accept: application/json",
+            "Content-Type: application/json",
+            "X-Firebase-Auth: serega_mem"
+    })
+    @POST("/api/v1/tasks")
+    Call<Tasks> insert(@Query("event_id") Long event_id, @Body Task task);
 
 }

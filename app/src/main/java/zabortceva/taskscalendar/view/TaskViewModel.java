@@ -32,24 +32,25 @@ public class TaskViewModel extends AndroidViewModel {
     }
 
     public void insert(Task task) {
-        repository.insert(task);
+        repository.insertTask(task);
     }
 
     public void update(Task task) {
-        repository.update(task);
+        repository.updateTask(task);
     }
 
     public void delete(Task task) {
-        repository.delete(task);
+        repository.deleteTask(task);
     }
 
     public LiveData<List<Task>> getDayTasks(Timestamp timestamp) {
         final int EQUAL_DATES = 0;
-        if (dayTasks != null && timestamp.compareTo(selectedDay) == EQUAL_DATES)
+        Date day = new Date(timestamp.getTime());
+        if (dayTasks != null && day.compareTo(selectedDay) == EQUAL_DATES)
             return dayTasks;
 
-        selectedDay = new Date(selectedDay.getTime());
-        dayTasks = repository.getDayTasks(timestamp);
+        selectedDay = day;
+        dayTasks = repository.getDayTasks(new Timestamp(day.getTime()));
         return dayTasks;
     }
 

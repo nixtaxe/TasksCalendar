@@ -36,17 +36,17 @@ public class SQLiteCalendarRepository implements CalendarRepository {
     }
 
     @Override
-    public void insert(Task task) {
+    public void insertTask(Task task) {
         new InsertTaskAsyncTask(taskDao).execute(task);
     }
 
     @Override
-    public void update(Task task) {
+    public void updateTask(Task task) {
         new UpdateTaskAsyncTask(taskDao).execute(task);
     }
 
     @Override
-    public void delete(Task task) {
+    public void deleteTask(Task task) {
         new DeleteTaskAsyncTask(taskDao).execute(task);
     }
 

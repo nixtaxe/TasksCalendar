@@ -10,11 +10,11 @@ import androidx.lifecycle.LiveData;
 import zabortceva.taskscalendar.localdata.Task;
 
 public interface CalendarRepository {
-    public void insert(Task task);
+    public void insertTask(Task task);
 
-    public void update(Task task);
+    public void updateTask(Task task);
 
-    public void delete(Task task);
+    public void deleteTask(Task task);
 
     public LiveData<List<Task>> getDayTasks(Timestamp day);
 

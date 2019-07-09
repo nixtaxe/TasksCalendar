@@ -141,6 +141,7 @@ public class CalendarActivity extends AppCompatActivity {
                 intent.putExtra(AddEditTaskActivity.EXTRA_TASK_NAME, task.getName());
                 intent.putExtra(AddEditTaskActivity.EXTRA_TASK_DETAILS, task.getDetails());
                 intent.putExtra(AddEditTaskActivity.EXTRA_TASK_DEADLINE_AT, new Timestamp(task.getDeadline_at()).toString());
+                intent.putExtra(AddEditTaskActivity.EXTRA_TASK_DEADLINE_AT, new Timestamp(task.getDeadline_at()).toString());
 
                 startActivityForResult(intent, EDIT_TASK_REQUEST);
             }

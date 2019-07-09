@@ -16,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:appComponentFactory">
-        android:networkSecurityConfig="@xml/network_security_config"
+
         <activity android:name=".AddEditTaskActivity"
             android:parentActivityName=".CalendarActivity"/>
         <activity android:name=".CalendarActivity"
