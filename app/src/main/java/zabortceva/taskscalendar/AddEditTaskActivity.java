@@ -7,6 +7,8 @@ import android.content.Intent;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
 import android.os.Bundle;
 import android.view.View;
@@ -23,9 +25,14 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Objects;
 
 import zabortceva.taskscalendar.localdata.Event;
+import zabortceva.taskscalendar.localdata.Task;
+import zabortceva.taskscalendar.view.EventViewModel;
 import zabortceva.taskscalendar.view.EventsSpinnerAdapter;
 
 public class AddEditTaskActivity extends AppCompatActivity {
@@ -45,7 +52,8 @@ public class AddEditTaskActivity extends AppCompatActivity {
     public static final int PICK_DEADLINE_DAY_REQUEST = 1;
 
     private ArrayList<String> eventsName;
-    private Spinner events;
+    private EventViewModel eventViewModel;
+    private Spinner eventsSpinner;
     private EditText editTaskName;
     private EditText editTaskDetails;
     private TextView editDeadlineAtDay;
@@ -116,7 +124,7 @@ public class AddEditTaskActivity extends AppCompatActivity {
             }
         });
 
-        Intent intent = getIntent();
+        final Intent intent = getIntent();
 
         if (intent.hasExtra(EXTRA_TASK_ID)) {
             editTaskName.setText(intent.getStringExtra(EXTRA_TASK_NAME));
@@ -131,20 +139,33 @@ public class AddEditTaskActivity extends AppCompatActivity {
             }
         });
 
-        events = (Spinner) findViewById(R.id.events);
-        eventsName = intent.getStringArrayListExtra(EXTRA_TASK_EVENTS_NAME);
+        eventsSpinner = (Spinner) findViewById(R.id.events);
 
-        //EventsSpinnerAdapter dataAdapter = new EventsSpinnerAdapter(this, android.R.layout.simple_spinner_item, )
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, eventsName);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        events.setAdapter(dataAdapter);
+        eventViewModel = ViewModelProviders.of(this).get(EventViewModel.class);
+        eventViewModel.getAllEvents().observe(this, new Observer<List<Event>>() {
+            @Override
+            public void onChanged(List<Event> events) {
+                EventsSpinnerAdapter dataAdapter = new EventsSpinnerAdapter(AddEditTaskActivity.this,
+                        android.R.layout.simple_spinner_item, events.toArray(new Event[events.size()]));
+                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                eventsSpinner.setAdapter(dataAdapter);
+                Long event_id = intent.getLongExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME, -1);
+                for (Event event : events) {
+                    if (Objects.equals(event.getId(), event_id)) {
+                        int event_pos = dataAdapter.getPosition(event);
+                        eventsSpinner.setSelection(event_pos);
+                    }
+                }
+            }
+        });
+
     }
 
     private void saveTask() {
         String name = editTaskName.getText().toString();
         String details = editTaskDetails.getText().toString();
         String deadline_at = editDeadlineAtDay.getText().toString();
+        long event_id = ((Event) eventsSpinner.getSelectedItem()).getId();
 
         if (name.trim().isEmpty()) {
             Toast.makeText(this, "Please insert title", Toast.LENGTH_LONG).show();
@@ -160,6 +181,7 @@ public class AddEditTaskActivity extends AppCompatActivity {
         }
 
         Intent data = new Intent();
+        data.putExtra(EXTRA_TASK_EVENTS_NAME, event_id);
         data.putExtra(EXTRA_TASK_NAME, name);
         data.putExtra(EXTRA_TASK_DETAILS, details);
         data.putExtra(EXTRA_TASK_DEADLINE_AT, deadline_at);

@@ -145,7 +145,7 @@ public class CalendarActivity extends AppCompatActivity {
             public void onItemClick(Task task) {
                 Intent intent = new Intent(CalendarActivity.this, AddEditTaskActivity.class);
 
-                intent.putStringArrayListExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME, events);
+                intent.putExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME, task.getEvent_id());
                 intent.putExtra(AddEditTaskActivity.EXTRA_TASK_ID, task.getId());
                 intent.putExtra(AddEditTaskActivity.EXTRA_TASK_NAME, task.getName());
                 intent.putExtra(AddEditTaskActivity.EXTRA_TASK_DETAILS, task.getDetails());
@@ -230,11 +230,13 @@ public class CalendarActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == ADD_TASK_REQUEST && resultCode == RESULT_OK) {
+            long event_id = data.getLongExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME, -1);
             String name = data.getStringExtra(AddEditTaskActivity.EXTRA_TASK_NAME);
             String details = data.getStringExtra(AddEditTaskActivity.EXTRA_TASK_DETAILS);
             Timestamp deadline_at = Timestamp.valueOf(data.getStringExtra(AddEditTaskActivity.EXTRA_TASK_DEADLINE_AT));
 
             Task task = new Task(name, details, deadline_at);
+            task.setEvent_id(event_id);
             taskViewModel.insert(task);
 
             Toast.makeText(this, R.string.task_was_saved, Toast.LENGTH_SHORT).show();
