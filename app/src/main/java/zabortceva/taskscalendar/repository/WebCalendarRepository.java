@@ -82,12 +82,32 @@ public class WebCalendarRepository implements CalendarRepository {
 
     @Override
     public void updateTask(Task task) {
+        tasksApi.update(task.getId(), task).enqueue(new Callback<Tasks>() {
+            @Override
+            public void onResponse(Call<Tasks> call, Response<Tasks> response) {
+                //
+            }
 
+            @Override
+            public void onFailure(Call<Tasks> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
     }
 
     @Override
     public void deleteTask(Task task) {
+        tasksApi.delete(task.getId()).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                //
+            }
 
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
     }
 
     @Override

@@ -149,11 +149,13 @@ public class AddEditTaskActivity extends AppCompatActivity {
                         android.R.layout.simple_spinner_item, events.toArray(new Event[events.size()]));
                 dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 eventsSpinner.setAdapter(dataAdapter);
-                Long event_id = intent.getLongExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME, -1);
-                for (Event event : events) {
-                    if (Objects.equals(event.getId(), event_id)) {
-                        int event_pos = dataAdapter.getPosition(event);
-                        eventsSpinner.setSelection(event_pos);
+                if (intent.hasExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME)) {
+                    Long event_id = intent.getLongExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME, -1);
+                    for (Event event : events) {
+                        if (Objects.equals(event.getId(), event_id)) {
+                            int event_pos = dataAdapter.getPosition(event);
+                            eventsSpinner.setSelection(event_pos);
+                        }
                     }
                 }
             }
@@ -186,7 +188,7 @@ public class AddEditTaskActivity extends AppCompatActivity {
         data.putExtra(EXTRA_TASK_DETAILS, details);
         data.putExtra(EXTRA_TASK_DEADLINE_AT, deadline_at);
 
-        int id = getIntent().getIntExtra(EXTRA_TASK_ID, -1);
+        long id = getIntent().getLongExtra(EXTRA_TASK_ID, -1);
         if (id != -1) {
             data.putExtra(EXTRA_TASK_ID, id);
         }

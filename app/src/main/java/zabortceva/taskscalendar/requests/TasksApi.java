@@ -9,14 +9,17 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import zabortceva.taskscalendar.localdata.CalendarDayConverters;
 import zabortceva.taskscalendar.localdata.Task;
+import zabortceva.taskscalendar.serverdata.Events;
 import zabortceva.taskscalendar.serverdata.Tasks;
 
 public interface TasksApi {
@@ -47,4 +50,19 @@ public interface TasksApi {
     @POST("/api/v1/tasks")
     Call<Tasks> insert(@Query("event_id") Long event_id, @Body Task task);
 
+    @Headers({
+            "Accept: application/json",
+            "Content-Type: application/json",
+            "X-Firebase-Auth: serega_mem"
+    })
+    @DELETE("/api/v1/tasks/{id}")
+    Call<Void> delete(@Path("id") Long id);
+
+    @Headers({
+            "Accept: application/json",
+            "Content-Type: application/json",
+            "X-Firebase-Auth: serega_mem"
+    })
+    @PATCH("/api/v1/tasks/{id}")
+    Call<Tasks> update(@Path("id") Long id, @Body Task task);
 }

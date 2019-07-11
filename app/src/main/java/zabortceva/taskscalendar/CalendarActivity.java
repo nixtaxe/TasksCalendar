@@ -146,6 +146,7 @@ public class CalendarActivity extends AppCompatActivity {
                 Intent intent = new Intent(CalendarActivity.this, AddEditTaskActivity.class);
 
                 intent.putExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME, task.getEvent_id());
+                intent.putExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME, task.getEvent_id());
                 intent.putExtra(AddEditTaskActivity.EXTRA_TASK_ID, task.getId());
                 intent.putExtra(AddEditTaskActivity.EXTRA_TASK_NAME, task.getName());
                 intent.putExtra(AddEditTaskActivity.EXTRA_TASK_DETAILS, task.getDetails());
@@ -241,7 +242,7 @@ public class CalendarActivity extends AppCompatActivity {
 
             Toast.makeText(this, R.string.task_was_saved, Toast.LENGTH_SHORT).show();
         } else if (requestCode == EDIT_TASK_REQUEST && resultCode == RESULT_OK) {
-            int id = data.getIntExtra(AddEditTaskActivity.EXTRA_TASK_ID, -1);
+            long id = data.getLongExtra(AddEditTaskActivity.EXTRA_TASK_ID, -1);
             if (id == -1) {
                 Toast.makeText(this, R.string.task_can_not_be_updated, Toast.LENGTH_SHORT).show();
                 return;
@@ -249,9 +250,11 @@ public class CalendarActivity extends AppCompatActivity {
             String name = data.getStringExtra(AddEditTaskActivity.EXTRA_TASK_NAME);
             String details = data.getStringExtra(AddEditTaskActivity.EXTRA_TASK_DETAILS);
             Timestamp deadline_at = Timestamp.valueOf(data.getStringExtra(AddEditTaskActivity.EXTRA_TASK_DEADLINE_AT));
+            long event_id = data.getLongExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME, -1);
 
             Task task = new Task(name, details, deadline_at);
             task.setId(Long.valueOf(id));
+            task.setEvent_id(event_id);
             taskViewModel.update(task);
 
             Toast.makeText(this, R.string.task_was_updated, Toast.LENGTH_SHORT).show();
