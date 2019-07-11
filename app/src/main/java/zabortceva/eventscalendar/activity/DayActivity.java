@@ -1,4 +1,4 @@
-package zabortceva.eventscalendar;
+package zabortceva.eventscalendar.activity;
 
 import android.content.Intent;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.List;
+
+import zabortceva.eventscalendar.R;
 
 public class DayActivity extends AppCompatActivity {
 

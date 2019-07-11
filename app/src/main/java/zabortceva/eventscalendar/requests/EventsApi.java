@@ -2,8 +2,10 @@ package zabortceva.eventscalendar.requests;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
@@ -36,4 +38,20 @@ public interface EventsApi {
     })
     @POST("/api/v1/events")
     Call<Events> insert(@Body Event event);
+
+    @Headers({
+            "Accept: application/json",
+            "Content-Type: application/json",
+            "X-Firebase-Auth: serega_mem"
+    })
+    @DELETE("/api/v1/events/{id}")
+    Call<Events> delete(@Path("id") long id);
+
+    @Headers({
+            "Accept: application/json",
+            "Content-Type: application/json",
+            "X-Firebase-Auth: serega_mem"
+    })
+    @PATCH("/api/v1/events/{id}")
+    Call<Events> update(@Path("id") long id, @Body Event event);
 }

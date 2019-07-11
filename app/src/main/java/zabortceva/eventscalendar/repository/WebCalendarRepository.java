@@ -308,4 +308,34 @@ public class WebCalendarRepository implements CalendarRepository {
 
         return data;
     }
+
+    @Override
+    public void deleteEvent(Event event) {
+        eventsApi.delete(event.getId()).enqueue(new Callback<Events>() {
+            @Override
+            public void onResponse(Call<Events> call, Response<Events> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<Events> call, Throwable t) {
+
+            }
+        });
+    }
+
+    @Override
+    public void updateEvent(Event event) {
+        eventsApi.update(event.getId(), event).enqueue(new Callback<Events>() {
+            @Override
+            public void onResponse(Call<Events> call, Response<Events> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<Events> call, Throwable t) {
+
+            }
+        });
+    }
 }

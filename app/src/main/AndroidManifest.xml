@@ -17,14 +17,14 @@
         android:theme="@style/AppTheme"
         tools:replace="android:appComponentFactory">
 
-        <activity android:name="zabortceva.eventscalendar.AddEditTaskActivity"
-            android:parentActivityName="zabortceva.eventscalendar.CalendarActivity"/>
-        <activity android:name="zabortceva.eventscalendar.EventsActivity"
-            android:parentActivityName="zabortceva.eventscalendar.CalendarActivity"/>
-        <activity android:name="zabortceva.eventscalendar.AddEditEventActivity"
-            android:parentActivityName="zabortceva.eventscalendar.EventsActivity"/>
-        <activity android:name="zabortceva.eventscalendar.LoginActivity"></activity>
-        <activity android:name="zabortceva.eventscalendar.CalendarActivity"
+        <activity android:name="zabortceva.eventscalendar.activity.AddEditTaskActivity"
+            android:parentActivityName="zabortceva.eventscalendar.activity.CalendarActivity"/>
+        <activity android:name="zabortceva.eventscalendar.activity.EventsActivity"
+            android:parentActivityName="zabortceva.eventscalendar.activity.CalendarActivity"/>
+        <activity android:name="zabortceva.eventscalendar.activity.AddEditEventActivity"
+            android:parentActivityName="zabortceva.eventscalendar.activity.EventsActivity"/>
+        <activity android:name="zabortceva.eventscalendar.activity.LoginActivity"></activity>
+        <activity android:name="zabortceva.eventscalendar.activity.CalendarActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

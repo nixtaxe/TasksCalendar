@@ -1,4 +1,4 @@
-package zabortceva.eventscalendar;
+package zabortceva.eventscalendar.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,12 +11,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import zabortceva.eventscalendar.R;
+
 public class AddEditEventActivity extends AppCompatActivity {
 
     public static final String EXTRA_EVENT_NAME = "zabortceva.eventscalendar.EXTRA_EVENT_NAME";
     public static final String EXTRA_EVENT_DETAILS = "zabortceva.eventscalendar.EXTRA_EVENT_DETAILS";
     public static final String EXTRA_EVENT_LOCATION = "zabortceva.eventscalendar.EXTRA_EVENT_LOCATION";
     public static final String EXTRA_EVENT_STATUS = "zabortceva.eventscalendar.EXTRA_EVENT_STATUS";
+    public static final String EXTRA_EVENT_OWNER_ID = "zabortceva.eventscalendar.EXTRA_EVENT_OWNER_ID";
+    public static final String EXTRA_EVENT_ID = "zabortceva.eventscalendar.EXTRA_EVENT_ID";
 
     private FloatingActionButton saveEventButton;
     private EditText editEventName;
@@ -41,6 +45,14 @@ public class AddEditEventActivity extends AppCompatActivity {
                 saveEvent();
             }
         });
+
+        Intent intent = getIntent();
+        if (intent.hasExtra(EXTRA_EVENT_ID)) {
+            editEventName.setText(intent.getStringExtra(EXTRA_EVENT_NAME));
+            editEventDetails.setText(intent.getStringExtra(EXTRA_EVENT_DETAILS));
+            editEventLocation.setText(intent.getStringExtra(EXTRA_EVENT_LOCATION));
+            editEventStatus.setText(intent.getStringExtra(EXTRA_EVENT_STATUS));
+        }
     }
 
     private void saveEvent() {
@@ -54,7 +66,15 @@ public class AddEditEventActivity extends AppCompatActivity {
             return;
         }
 
+        Intent intent = getIntent();
+
         Intent data = new Intent();
+        if (intent.hasExtra(EXTRA_EVENT_ID)) {
+            long id = intent.getLongExtra(EXTRA_EVENT_ID, -1);
+            String owner_id = intent.getStringExtra(EXTRA_EVENT_OWNER_ID);
+            data.putExtra(EXTRA_EVENT_ID, id);
+            data.putExtra(EXTRA_EVENT_OWNER_ID, owner_id);
+        }
         data.putExtra(EXTRA_EVENT_NAME, name);
         data.putExtra(EXTRA_EVENT_DETAILS, details);
         data.putExtra(EXTRA_EVENT_LOCATION, location);

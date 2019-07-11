@@ -1,4 +1,4 @@
-package zabortceva.eventscalendar;
+package zabortceva.eventscalendar.activity;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -28,9 +28,12 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
+import zabortceva.eventscalendar.R;
 import zabortceva.eventscalendar.localdata.Event;
+import zabortceva.eventscalendar.view.DatePickerFragment;
 import zabortceva.eventscalendar.view.EventViewModel;
 import zabortceva.eventscalendar.view.EventsSpinnerAdapter;
+import zabortceva.eventscalendar.view.TimePickerFragment;
 
 public class AddEditTaskActivity extends AppCompatActivity {
 

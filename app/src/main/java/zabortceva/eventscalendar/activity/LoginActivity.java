@@ -1,4 +1,4 @@
-package zabortceva.eventscalendar;
+package zabortceva.eventscalendar.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,6 +23,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+
+import zabortceva.eventscalendar.R;
 
 public class LoginActivity extends AppCompatActivity {
 

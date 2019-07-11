@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import androidx.core.app.NotificationCompat;
-import zabortceva.eventscalendar.AddEditTaskActivity;
+import zabortceva.eventscalendar.activity.AddEditTaskActivity;
 
 public class AlertReceiver extends BroadcastReceiver {
     @Override

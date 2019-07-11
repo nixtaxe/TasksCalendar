@@ -28,5 +28,9 @@ public interface CalendarRepository {
 
     public LiveData<Events> insertEvent(Event event);
 
+    public void deleteEvent(Event event);
+
+    public void updateEvent(Event event);
+
     public LiveData<Event> getEventById(long id);
 }

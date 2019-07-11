@@ -1,4 +1,4 @@
-package zabortceva.eventscalendar;
+package zabortceva.eventscalendar.activity;
 
 import androidx.lifecycle.Observer;
 
@@ -31,7 +31,7 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.prolificinteractive.materialcalendarview.spans.DotSpan;
 
-import zabortceva.eventscalendar.localdata.Event;
+import zabortceva.eventscalendar.R;
 import zabortceva.eventscalendar.localdata.Task;
 import zabortceva.eventscalendar.view.EventViewModel;
 import zabortceva.eventscalendar.view.TaskViewModel;
@@ -177,16 +177,16 @@ public class CalendarActivity extends AppCompatActivity {
         });
 
         eventViewModel = ViewModelProviders.of(this).get(EventViewModel.class);
-        events = new ArrayList<>();
-        eventViewModel.getAllEvents().observe(this, new Observer<List<Event>>() {
-            @Override
-            public void onChanged(List<Event> new_events) {
-                events.clear();
-                for (Event event : new_events) {
-                    events.add(event.getName());
-                }
-            }
-        });
+//        events = new ArrayList<>();
+//        eventViewModel.getAllEvents().observe(this, new Observer<List<Event>>() {
+//            @Override
+//            public void onChanged(List<Event> new_events) {
+//                events.clear();
+//                for (Event event : new_events) {
+//                    events.add(event.getName());
+//                }
+//            }
+//        });
 
         viewEventsButton = findViewById(R.id.view_events_button);
         viewEventsButton.setOnClickListener(new View.OnClickListener() {
@@ -243,7 +243,7 @@ public class CalendarActivity extends AppCompatActivity {
             long event_id = data.getLongExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME, -1);
 
             Task task = new Task(name, details, deadline_at);
-            task.setId(Long.valueOf(id));
+            task.setId(id);
             task.setEvent_id(event_id);
             taskViewModel.update(task);
 
