@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey;
 import com.google.gson.annotations.Expose;
 
 @Entity(tableName = "event_pattern_table")
-public class EventPattern {
+public class Pattern {
     @PrimaryKey
     @Expose
     private Long id;
@@ -28,10 +28,10 @@ public class EventPattern {
     private String timezone;
 
     /*Default constructor*/
-    public EventPattern() {
+    public Pattern() {
     }
 
-    public EventPattern(Long duration, Long ended_at, String exrule, String rrule, Long started_at, String timezone) {
+    public Pattern(Long duration, Long ended_at, String exrule, String rrule, Long started_at, String timezone) {
         this.duration = duration;
         this.ended_at = ended_at;
         this.exrule = exrule;

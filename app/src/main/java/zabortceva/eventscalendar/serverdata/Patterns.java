@@ -2,13 +2,13 @@ package zabortceva.eventscalendar.serverdata;
 
 import com.google.gson.annotations.Expose;
 
-import zabortceva.eventscalendar.localdata.EventPattern;
+import zabortceva.eventscalendar.localdata.Pattern;
 
-public class EventPatterns {
+public class Patterns {
     @Expose
     private int count;
     @Expose
-    private EventPattern[] data;
+    private Pattern[] data;
     @Expose
     private String message;
     @Expose
@@ -22,7 +22,7 @@ public class EventPatterns {
         return count;
     }
 
-    public EventPattern[] getData() {
+    public Pattern[] getData() {
         return data;
     }
 

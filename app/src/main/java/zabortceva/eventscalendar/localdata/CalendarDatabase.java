@@ -12,7 +12,7 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.annotation.NonNull;
 
-@Database(entities = {Task.class, Event.class, EventPattern.class, User.class},
+@Database(entities = {Task.class, Event.class, Pattern.class, User.class},
 version = 2)
 @TypeConverters({TimestampConverters.class})
 public abstract class CalendarDatabase extends RoomDatabase {

@@ -46,23 +46,28 @@ public class TaskViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<Task>> getDayTasks(Timestamp timestamp) {
-        final int EQUAL_DATES = 0;
+//        final int EQUAL_DATES = 0;
         Date day = new Date(timestamp.getTime());
-        if (dayTasks != null && day.compareTo(selectedDay) == EQUAL_DATES)
-            return dayTasks;
-
+//        if (dayTasks != null && day.compareTo(selectedDay) == EQUAL_DATES)
+//            return dayTasks;
+//
         selectedDay = day;
-        dayTasks = repository.getDayTasks(new Timestamp(day.getTime()));
-        return dayTasks;
+//        dayTasks = repository.getDayTasks(timestamp);
+//        return dayTasks;
+        return repository.getDayTasks(timestamp);
     }
 
     public Timestamp getSelectedDay() {return new Timestamp(selectedDay.getTime());}
 
     public LiveData<List<Task>> getAllTasks() {
-        return allTasks;
+//        allTasks = repository.getAllTasks();
+//        return allTasks;
+        return repository.getAllTasks();
     }
 
     public LiveData<List<CalendarDay>> getAllBusyDays() {
-        return busyDays;
+//        busyDays = repository.getAllBusyDays();
+//        return busyDays;
+        return repository.getAllBusyDays();
     }
 }

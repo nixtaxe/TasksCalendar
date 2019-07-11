@@ -53,6 +53,7 @@ public class CalendarActivity extends AppCompatActivity {
     private FloatingActionButton viewAccountButton;
     final TasksAdapter tasksAdapter = new TasksAdapter();
     private Observer<List<Task>> dayTasksObserver;
+    private Observer<List<CalendarDay>> busyDaysObserver;
     private EventDecorator busyDaysDecorator = new EventDecorator(0, new ArrayList<CalendarDay>());
 
     private TaskViewModel taskViewModel;
@@ -70,17 +71,18 @@ public class CalendarActivity extends AppCompatActivity {
         tasksView.setAdapter(tasksAdapter);
 
         taskViewModel = ViewModelProviders.of(this).get(TaskViewModel.class);
+
         dayTasksObserver = new Observer<List<Task>>() {
             @Override
             public void onChanged(List<Task> tasks) {
                 tasksAdapter.submitList(tasks);
             }
         };
-
         observeNewDay(new Timestamp(System.currentTimeMillis()));
-        taskViewModel.getAllBusyDays().observe(this, new Observer<List<CalendarDay>>() {
+
+        busyDaysObserver = new Observer<List<CalendarDay>>() {
             @Override
-            public void onChanged(@Nullable List<CalendarDay> busyDays) {
+            public void onChanged(List<CalendarDay> busyDays) {
                 HashSet<CalendarDay> newDays = new HashSet<CalendarDay>(busyDays);
                 if (busyDaysDecorator.getDates().equals(newDays))
                     return;
@@ -89,7 +91,8 @@ public class CalendarActivity extends AppCompatActivity {
                 busyDaysDecorator.setDates(newDays);
                 calendarView.addDecorator(busyDaysDecorator);
             }
-        });
+        };
+        taskViewModel.getAllBusyDays().observe(this, busyDaysObserver);
 
 //        taskViewModel.getAllTasks().observe(this, new Observer<List<Task>>() {
 //            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -126,6 +129,7 @@ public class CalendarActivity extends AppCompatActivity {
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 taskViewModel.delete(tasksAdapter.getTaskAt(viewHolder.getAdapterPosition()));
+                updateAllObservers();
                 Toast.makeText(CalendarActivity.this, R.string.task_was_deleted, Toast.LENGTH_SHORT).show();
             }
         }).attachToRecyclerView(tasksView);
@@ -209,11 +213,23 @@ public class CalendarActivity extends AppCompatActivity {
 
     }
 
+    private void updateAllObservers() {
+        observeNewDay(taskViewModel.getSelectedDay());
+        observeBusyDays();
+    }
+
     private void observeNewDay(Timestamp timestamp) {
         if (taskViewModel.getDayTasks(taskViewModel.getSelectedDay()).hasObservers())
             taskViewModel.getDayTasks(taskViewModel.getSelectedDay()).removeObserver(dayTasksObserver);
 
         taskViewModel.getDayTasks(timestamp).observe(this, dayTasksObserver);
+    }
+
+    private void observeBusyDays() {
+        if (taskViewModel.getAllBusyDays().hasActiveObservers())
+            taskViewModel.getAllBusyDays().removeObserver(busyDaysObserver);
+
+        taskViewModel.getAllBusyDays().observe(this, busyDaysObserver);
     }
 
     @Override
@@ -229,6 +245,8 @@ public class CalendarActivity extends AppCompatActivity {
             Task task = new Task(name, details, deadline_at);
             task.setEvent_id(event_id);
             taskViewModel.insert(task);
+
+            updateAllObservers();
 
             Toast.makeText(this, R.string.task_was_saved, Toast.LENGTH_SHORT).show();
         } else if (requestCode == EDIT_TASK_REQUEST && resultCode == RESULT_OK) {
@@ -246,6 +264,8 @@ public class CalendarActivity extends AppCompatActivity {
             task.setId(id);
             task.setEvent_id(event_id);
             taskViewModel.update(task);
+
+            updateAllObservers();
 
             Toast.makeText(this, R.string.task_was_updated, Toast.LENGTH_SHORT).show();
         } else {
