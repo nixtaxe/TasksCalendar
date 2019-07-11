@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData;
 import zabortceva.taskscalendar.localdata.Event;
 import zabortceva.taskscalendar.localdata.Task;
 import zabortceva.taskscalendar.serverdata.Events;
+import zabortceva.taskscalendar.view.TaskViewData;
 
 public interface CalendarRepository {
     public void insertTask(Task task);
@@ -28,4 +29,6 @@ public interface CalendarRepository {
     public LiveData<List<Event>> getAllEvents();
 
     public LiveData<Events> insertEvent(Event event);
+
+    public LiveData<Event> getEventById(long id);
 }

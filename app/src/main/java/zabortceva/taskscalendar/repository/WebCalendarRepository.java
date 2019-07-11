@@ -266,4 +266,27 @@ public class WebCalendarRepository implements CalendarRepository {
 
         return data;
     }
+
+    @Override
+    public LiveData<Event> getEventById(long id) {
+        final MutableLiveData<Event> data = new MutableLiveData<>();
+
+        eventsApi.getEventById(id).enqueue(new Callback<Events>() {
+            @Override
+            public void onResponse(Call<Events> call, Response<Events> response) {
+                if (response.body() != null) {
+                    data.setValue(response.body().getData()[0]);
+                } else {
+                    Log.v("GetEventById", "Null");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Events> call, Throwable t) {
+
+            }
+        });
+
+        return data;
+    }
 }

@@ -42,6 +42,7 @@ import com.prolificinteractive.materialcalendarview.spans.DotSpan;
 import zabortceva.taskscalendar.localdata.Event;
 import zabortceva.taskscalendar.localdata.Task;
 import zabortceva.taskscalendar.view.EventViewModel;
+import zabortceva.taskscalendar.view.TaskViewData;
 import zabortceva.taskscalendar.view.TaskViewModel;
 import zabortceva.taskscalendar.view.TasksAdapter;
 import zabortceva.taskscalendar.view.AlertReceiver;
@@ -59,6 +60,7 @@ public class CalendarActivity extends AppCompatActivity {
     private RecyclerView tasksView;
     private FloatingActionButton addTaskButton;
     private FloatingActionButton viewEventsButton;
+    private FloatingActionButton viewAccountButton;
     final TasksAdapter tasksAdapter = new TasksAdapter();
     private Observer<List<Task>> dayTasksObserver;
     private EventDecorator busyDaysDecorator = new EventDecorator(0, new ArrayList<CalendarDay>());
@@ -203,6 +205,14 @@ public class CalendarActivity extends AppCompatActivity {
                 intent.putStringArrayListExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME, events);
 
                 startActivity(intent);
+            }
+        });
+
+        viewAccountButton = findViewById(R.id.view_account_button);
+        viewAccountButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(CalendarActivity.this, LoginActivity.class));
             }
         });
 

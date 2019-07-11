@@ -25,6 +25,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import zabortceva.taskscalendar.localdata.Event;
+import zabortceva.taskscalendar.view.EventsSpinnerAdapter;
+
 public class AddEditTaskActivity extends AppCompatActivity {
 
     public static final String EXTRA_TASK_EVENTS_NAME = "zabortceva.taskscalendar.EXTRA_TASK_EVENTS_NAME";
@@ -131,6 +134,7 @@ public class AddEditTaskActivity extends AppCompatActivity {
         events = (Spinner) findViewById(R.id.events);
         eventsName = intent.getStringArrayListExtra(EXTRA_TASK_EVENTS_NAME);
 
+        //EventsSpinnerAdapter dataAdapter = new EventsSpinnerAdapter(this, android.R.layout.simple_spinner_item, )
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, eventsName);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

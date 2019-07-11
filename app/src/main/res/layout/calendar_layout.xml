@@ -35,7 +35,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_events"
         android:layout_alignParentBottom="true"
-        android:layout_toStartOf="@+id/add_task_button"
+        android:layout_centerHorizontal="true"
         android:layout_margin="8dp"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -44,8 +44,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_add"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
+        android:layout_toEndOf="@+id/view_events_button"
         android:layout_margin="8dp"/>
 
 

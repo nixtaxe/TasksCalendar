@@ -24,10 +24,23 @@
         android:padding="16dp"
         android:layout_above="@id/save_task_button">
 
-        <Spinner
-            android:id="@+id/events"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" Event "
+                android:textSize="20sp"/>
+
+            <Spinner
+                android:id="@+id/events"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
 
         <EditText
             android:id="@+id/edit_task_name"
@@ -78,8 +91,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_save"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
+        android:layout_centerHorizontal="true"
         android:layout_margin="8dp"/>
 
     <!--<DatePicker-->

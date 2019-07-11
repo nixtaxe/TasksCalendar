@@ -23,8 +23,8 @@
             android:parentActivityName=".CalendarActivity"/>
         <activity android:name=".AddEditEventActivity"
             android:parentActivityName=".EventsActivity"/>
-        <activity android:name=".CalendarActivity"></activity>
-        <activity android:name=".LoginActivity"
+        <activity android:name=".LoginActivity"></activity>
+        <activity android:name=".CalendarActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
