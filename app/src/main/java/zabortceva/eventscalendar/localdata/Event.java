@@ -14,22 +14,6 @@ public class Event {
     @Expose
     private String owner_id;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setOwner_id(String owner_id) {
-        this.owner_id = owner_id;
-    }
-
-    public void setCreated_at(Long created_at) {
-        this.created_at = created_at;
-    }
-
-    public void setUpdated_at(Long updated_at) {
-        this.updated_at = updated_at;
-    }
-
     @Expose
     private Long created_at;
 
@@ -48,7 +32,6 @@ public class Event {
     @Expose
     private String status;
 
-    /*Default constructor*/
     public Event() {
     }
 
@@ -105,5 +88,21 @@ public class Event {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setOwner_id(String owner_id) {
+        this.owner_id = owner_id;
+    }
+
+    public void setCreated_at(Long created_at) {
+        this.created_at = created_at;
+    }
+
+    public void setUpdated_at(Long updated_at) {
+        this.updated_at = updated_at;
     }
 }

@@ -27,7 +27,6 @@ public class Pattern {
     @Expose
     private String timezone;
 
-    /*Default constructor*/
     public Pattern() {
     }
 

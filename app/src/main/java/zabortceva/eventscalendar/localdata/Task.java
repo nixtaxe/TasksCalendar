@@ -55,22 +55,14 @@ public class Task {
     @TypeConverters({TimestampConverters.class})
     private Long updated_at;
 
+    public Task() {
+    }
+
     public Task(String name, String details, Timestamp deadline_at) {
         this.name = name;
         this.details = details;
         this.deadline_at = deadline_at.getTime();
         this.created_at = System.currentTimeMillis();
-    }
-
-    public Task() {
-        this.id = 0L;
-        this.name = "";
-        this.details = "";
-        this.event_id = 0L;
-        this.parent_id = 0L;
-        this.deadline_at = System.currentTimeMillis();
-        this.created_at = System.currentTimeMillis();
-        this.updated_at = System.currentTimeMillis();
     }
 
     @Override

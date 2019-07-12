@@ -19,7 +19,6 @@ public class Permission {
     @Expose
     private String name;
 
-    /*Default constructor*/
     public Permission() {
     }
 

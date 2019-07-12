@@ -23,8 +23,8 @@
             android:parentActivityName="zabortceva.eventscalendar.activity.CalendarActivity"/>
         <activity android:name="zabortceva.eventscalendar.activity.AddEditEventActivity"
             android:parentActivityName="zabortceva.eventscalendar.activity.EventsActivity"/>
-        <activity android:name="zabortceva.eventscalendar.activity.LoginActivity"></activity>
-        <activity android:name="zabortceva.eventscalendar.activity.CalendarActivity"
+        <activity android:name="zabortceva.eventscalendar.activity.CalendarActivity"></activity>
+        <activity android:name="zabortceva.eventscalendar.activity.LoginActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
