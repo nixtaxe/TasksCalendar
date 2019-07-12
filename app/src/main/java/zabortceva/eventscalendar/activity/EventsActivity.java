@@ -1,6 +1,7 @@
 package zabortceva.eventscalendar.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -86,6 +87,8 @@ public class EventsActivity extends AppCompatActivity {
         }).attachToRecyclerView(eventsView);
 
         eventViewModel = ViewModelProviders.of(this).get(EventViewModel.class);
+        SharedPreferences sharedPreferences = getSharedPreferences(LoginActivity.PREFERENCES, MODE_PRIVATE);
+        eventViewModel.setIdToken(sharedPreferences.getString(LoginActivity.TOKEN, "serega_mem"));
         eventViewModel.getAllEvents().observe(this, new Observer<List<Event>>() {
             @Override
             public void onChanged(List<Event> events) {

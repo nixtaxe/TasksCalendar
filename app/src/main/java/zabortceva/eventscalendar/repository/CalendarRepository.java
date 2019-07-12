@@ -12,6 +12,8 @@ import zabortceva.eventscalendar.localdata.Task;
 import zabortceva.eventscalendar.serverdata.Events;
 
 public interface CalendarRepository {
+    public void setIdToken(String idToken);
+
     public void insertTask(Task task);
 
     public void updateTask(Task task);

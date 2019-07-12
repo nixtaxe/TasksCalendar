@@ -25,20 +25,22 @@ public class TaskViewModel extends AndroidViewModel {
     public TaskViewModel(Application application) {
         super(application);
 
-        repository = new WebCalendarRepository(application);
-        allTasks = repository.getAllTasks();
+        repository = WebCalendarRepository.getInstance(application);
+//        allTasks = repository.getAllTasks();
         selectedDay = new Date(System.currentTimeMillis());
-        busyDays = repository.getAllBusyDays();
+//        busyDays = repository.getAllBusyDays();
+    }
+
+    public void setIdToken(String idToken) {
+        repository.setIdToken(idToken);
     }
 
     public void insert(Task task) {
         repository.insertTask(task);
-        getDayTasks(new Timestamp(selectedDay.getTime()));
     }
 
     public void update(Task task) {
         repository.updateTask(task);
-        getDayTasks(new Timestamp(selectedDay.getTime()));
     }
 
     public void delete(Task task) {

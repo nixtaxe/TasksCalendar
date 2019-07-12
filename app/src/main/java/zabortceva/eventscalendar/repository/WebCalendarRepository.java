@@ -1,6 +1,7 @@
 package zabortceva.eventscalendar.repository;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.prolificinteractive.materialcalendarview.CalendarDay;
@@ -33,6 +34,7 @@ import zabortceva.eventscalendar.serverdata.ServerDatabase;
 import zabortceva.eventscalendar.serverdata.Tasks;
 
 public class WebCalendarRepository implements CalendarRepository {
+    private static WebCalendarRepository repository;
     private Retrofit serverDatabase;
     
     private TasksApi tasksApi;
@@ -42,9 +44,10 @@ public class WebCalendarRepository implements CalendarRepository {
 //    private Date selectedDay;
 
     private EventsApi eventsApi;
+    private String idToken;
 //    final private MutableLiveData<List<Event>> allEvents;
 
-    public WebCalendarRepository(Application app) {
+    private WebCalendarRepository(Application app) {
         serverDatabase = ServerDatabase.getInstance();
         tasksApi = ServerDatabase.getTasksTable();
         eventsApi = ServerDatabase.getEventsTable();
@@ -64,9 +67,22 @@ public class WebCalendarRepository implements CalendarRepository {
 //        allEvents = new MutableLiveData<>();
     }
 
+    public static WebCalendarRepository getInstance(Application app) {
+        if (repository == null) {
+            repository = new WebCalendarRepository(app);
+        }
+
+        return repository;
+    }
+
+    @Override
+    public void setIdToken(String idToken) {
+        this.idToken = idToken;
+    }
+
     @Override
     public void insertTask(Task task) {
-        tasksApi.insert(task.getEvent_id(), task).enqueue(new Callback<Tasks>() {
+        tasksApi.insert(task.getEvent_id(), task, idToken).enqueue(new Callback<Tasks>() {
             @Override
             public void onResponse(Call<Tasks> call, Response<Tasks> response) {
                 //
@@ -81,7 +97,7 @@ public class WebCalendarRepository implements CalendarRepository {
 
     @Override
     public void updateTask(Task task) {
-        tasksApi.update(task.getId(), task).enqueue(new Callback<Tasks>() {
+        tasksApi.update(task.getId(), task, idToken).enqueue(new Callback<Tasks>() {
             @Override
             public void onResponse(Call<Tasks> call, Response<Tasks> response) {
                 //
@@ -96,7 +112,7 @@ public class WebCalendarRepository implements CalendarRepository {
 
     @Override
     public void deleteTask(Task task) {
-        tasksApi.delete(task.getId()).enqueue(new Callback<Void>() {
+        tasksApi.delete(task.getId(), idToken).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 //
@@ -113,7 +129,7 @@ public class WebCalendarRepository implements CalendarRepository {
     public LiveData<List<Event>> getAllEvents() {
         final MutableLiveData<List<Event>> data = new MutableLiveData<>();
 
-        eventsApi.getAllEvents(1000).enqueue(new Callback<Events>() {
+        eventsApi.getAllEvents(1000, idToken).enqueue(new Callback<Events>() {
             @Override
             public void onResponse(Call<Events> call, Response<Events> response) {
                 if (response.body() != null)
@@ -142,7 +158,7 @@ public class WebCalendarRepository implements CalendarRepository {
 
         final MutableLiveData<List<Event>> data = new MutableLiveData<>();
 
-        eventsApi.getEventsByInterval(startOfDay, endOfDay).enqueue(new Callback<Events>() {
+        eventsApi.getEventsByInterval(startOfDay, endOfDay, idToken).enqueue(new Callback<Events>() {
             @Override
             public void onResponse(Call<Events> call, Response<Events> response) {
                 if (response.body() != null)
@@ -180,7 +196,7 @@ public class WebCalendarRepository implements CalendarRepository {
 
         final MutableLiveData<List<Task>> data = new MutableLiveData<>();
 
-        tasksApi.getAllTasks(1000).enqueue(new Callback<Tasks>() {
+        tasksApi.getAllTasks(1000, idToken).enqueue(new Callback<Tasks>() {
             @Override
             public void onResponse(Call<Tasks> call, Response<Tasks> response) {
                 if (response.body() != null) {
@@ -217,7 +233,7 @@ public class WebCalendarRepository implements CalendarRepository {
     public LiveData<List<Task>> getAllTasks() {
         final MutableLiveData<List<Task>> data = new MutableLiveData<>();
 
-        tasksApi.getAllTasks(1000).enqueue(new Callback<Tasks>() {
+        tasksApi.getAllTasks(1000, idToken).enqueue(new Callback<Tasks>() {
             @Override
             public void onResponse(Call<Tasks> call, Response<Tasks> response) {
                 if (response.body() != null)
@@ -240,7 +256,7 @@ public class WebCalendarRepository implements CalendarRepository {
     public LiveData<List<CalendarDay>> getAllBusyDays() {
         final MutableLiveData<List<CalendarDay>> data = new MutableLiveData<>();
 
-        tasksApi.getAllTasks(1000).enqueue(new Callback<Tasks>() {
+        tasksApi.getAllTasks(1000, idToken).enqueue(new Callback<Tasks>() {
             @Override
             public void onResponse(Call<Tasks> call, Response<Tasks> response) {
                 if (response.body() != null) {
@@ -249,6 +265,7 @@ public class WebCalendarRepository implements CalendarRepository {
                         days.add(new CalendarDay(new Date(task.getDeadline_at())));
                     }
                     data.setValue(days);
+                    Log.v("GetAllTasks", "OK");
                 } else {
                     Log.v("GetAllTasks", "Null");
                 }
@@ -267,11 +284,12 @@ public class WebCalendarRepository implements CalendarRepository {
     public LiveData<Events> insertEvent(Event event) {
         final MutableLiveData<Events> data = new MutableLiveData<>();
 
-        eventsApi.insert(event).enqueue(new Callback<Events>() {
+        eventsApi.insert(event, idToken).enqueue(new Callback<Events>() {
             @Override
             public void onResponse(Call<Events> call, Response<Events> response) {
                 if (response.body() != null) {
                     data.setValue(response.body());
+                    Log.v("InsertEvent", "OK");
                 } else {
                     Log.v("InsertEvent", "Null");
                 }
@@ -290,7 +308,7 @@ public class WebCalendarRepository implements CalendarRepository {
     public LiveData<Event> getEventById(long id) {
         final MutableLiveData<Event> data = new MutableLiveData<>();
 
-        eventsApi.getEventById(id).enqueue(new Callback<Events>() {
+        eventsApi.getEventById(id, idToken).enqueue(new Callback<Events>() {
             @Override
             public void onResponse(Call<Events> call, Response<Events> response) {
                 if (response.body() != null) {
@@ -311,7 +329,7 @@ public class WebCalendarRepository implements CalendarRepository {
 
     @Override
     public void deleteEvent(Event event) {
-        eventsApi.delete(event.getId()).enqueue(new Callback<Events>() {
+        eventsApi.delete(event.getId(), idToken).enqueue(new Callback<Events>() {
             @Override
             public void onResponse(Call<Events> call, Response<Events> response) {
 
@@ -326,7 +344,7 @@ public class WebCalendarRepository implements CalendarRepository {
 
     @Override
     public void updateEvent(Event event) {
-        eventsApi.update(event.getId(), event).enqueue(new Callback<Events>() {
+        eventsApi.update(event.getId(), event, idToken).enqueue(new Callback<Events>() {
             @Override
             public void onResponse(Call<Events> call, Response<Events> response) {
 

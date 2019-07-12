@@ -23,8 +23,12 @@ public class EventViewModel extends AndroidViewModel {
     public EventViewModel(@NonNull Application application) {
         super(application);
 
-        repository = new WebCalendarRepository(application);
-        allEvents = repository.getAllEvents();
+        repository = WebCalendarRepository.getInstance(application);
+//        allEvents = repository.getAllEvents();
+    }
+
+    public void setIdToken(String idToken) {
+        repository.setIdToken(idToken);
     }
 
     public LiveData<List<Event>> getAllEvents() {

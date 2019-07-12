@@ -3,6 +3,7 @@ package zabortceva.eventscalendar.activity;
 import androidx.lifecycle.Observer;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -71,6 +72,8 @@ public class CalendarActivity extends AppCompatActivity {
         tasksView.setAdapter(tasksAdapter);
 
         taskViewModel = ViewModelProviders.of(this).get(TaskViewModel.class);
+        SharedPreferences sharedPreferences = getSharedPreferences(LoginActivity.PREFERENCES, MODE_PRIVATE);
+        taskViewModel.setIdToken(sharedPreferences.getString(LoginActivity.TOKEN, "serega_mem"));
 
         dayTasksObserver = new Observer<List<Task>>() {
             @Override

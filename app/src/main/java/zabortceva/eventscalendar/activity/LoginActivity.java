@@ -1,6 +1,7 @@
 package zabortceva.eventscalendar.activity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -25,13 +26,15 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.squareup.picasso.Picasso;
 
 import zabortceva.eventscalendar.R;
 
 public class LoginActivity extends AppCompatActivity {
-
+    public static final String PREFERENCES = "PREFERENCES";
+    public static final String TOKEN = "TOKEN";
     SignInButton signInButton;
     FloatingActionButton signOutButton;
     FloatingActionButton openCalendarButton;
@@ -83,7 +86,8 @@ public class LoginActivity extends AppCompatActivity {
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                updateUI(firebaseAuth.getCurrentUser());
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                updateUI(user);
             }
         };
 
@@ -116,6 +120,10 @@ public class LoginActivity extends AppCompatActivity {
                 new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
+//                        SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCES, MODE_PRIVATE);
+//                        SharedPreferences.Editor editor = sharedPreferences.edit();
+//                        editor.putString(TOKEN, null);
+//                        editor.apply();
                     }
                 });
     }
@@ -157,6 +165,16 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             FirebaseUser user = mAuth.getCurrentUser();
+                            user.getIdToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<GetTokenResult> task) {
+                                    SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCES, MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    String idToken = task.getResult().getToken();
+                                    editor.putString(TOKEN, idToken);
+                                    editor.apply();
+                                }
+                            });
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("TAG", "signInWithCredential:failure", task.getException());
@@ -192,7 +210,7 @@ public class LoginActivity extends AppCompatActivity {
             signOutButton.hide();
             openCalendarButton.hide();
             shareCalendarButton.hide();
-            
+
             signInButton.setVisibility(View.VISIBLE);
             welcomeText.setVisibility(View.VISIBLE);
         }
