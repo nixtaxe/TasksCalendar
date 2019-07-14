@@ -15,33 +15,33 @@ import zabortceva.eventscalendar.serverdata.Events;
 
 public interface EventsApi {
 
-    @GET("/api/v1/events")
-    Call<Events> getEventsByInterval(@Query("from") Long from, @Query("to") Long to, @Header("X-Firebase-Auth") String idToken);
+    @GET(ApiStrings.EVENTS_PATH)
+    Call<Events> getEventsByInterval(@Query(ApiStrings.FROM) Long from, @Query(ApiStrings.TO) Long to, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 
-    @GET("/api/v1/events/{id}")
-    Call<Events> getEventById(@Path("id") long id, @Header("X-Firebase-Auth") String idToken);
+    @GET(ApiStrings.EVENTS_ID_PATH)
+    Call<Events> getEventById(@Path(ApiStrings.ID) long id, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 
-    @GET("/api/v1/events")
-    Call<Events> getAllEvents(@Query("count") int count, @Header("X-Firebase-Auth") String idToken);
-
-    @Headers({
-            "Accept: application/json",
-            "Content-Type: application/json"
-    })
-    @POST("/api/v1/events")
-    Call<Events> insert(@Body Event event, @Header("X-Firebase-Auth") String idToken);
+    @GET(ApiStrings.EVENTS_PATH)
+    Call<Events> getAllEvents(@Query(ApiStrings.COUNT) int count, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 
     @Headers({
-            "Accept: application/json",
-            "Content-Type: application/json"
+            ApiStrings.ACCEPT,
+            ApiStrings.CONTENT_TYPE
     })
-    @DELETE("/api/v1/events/{id}")
-    Call<Events> delete(@Path("id") long id, @Header("X-Firebase-Auth") String idToken);
+    @POST(ApiStrings.EVENTS_PATH)
+    Call<Events> insert(@Body Event event, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 
     @Headers({
-            "Accept: application/json",
-            "Content-Type: application/json"
+            ApiStrings.ACCEPT,
+            ApiStrings.CONTENT_TYPE
     })
-    @PATCH("/api/v1/events/{id}")
-    Call<Events> update(@Path("id") long id, @Body Event event, @Header("X-Firebase-Auth") String idToken);
+    @DELETE(ApiStrings.EVENTS_ID_PATH)
+    Call<Events> delete(@Path(ApiStrings.ID) long id, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
+
+    @Headers({
+            ApiStrings.ACCEPT,
+            ApiStrings.CONTENT_TYPE
+    })
+    @PATCH(ApiStrings.EVENTS_ID_PATH)
+    Call<Events> update(@Path(ApiStrings.ID) long id, @Body Event event, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 }

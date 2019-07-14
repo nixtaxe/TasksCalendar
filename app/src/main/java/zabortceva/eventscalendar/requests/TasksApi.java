@@ -15,33 +15,33 @@ import zabortceva.eventscalendar.serverdata.Tasks;
 
 public interface TasksApi {
 
-    @GET("api/v1/tasks")
-    Call<Tasks> getDayTasks(@Query("id") Long[] id, @Header("X-Firebase_Auth") String idToken);
+    @GET(ApiStrings.TASKS_PATH)
+    Call<Tasks> getDayTasks(@Query(ApiStrings.ID) Long[] id, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 
-    @GET("/api/v1/tasks")
-    Call<Tasks> getAllTasks(@Query("count") int count, @Header("X-Firebase_Auth") String idToken);
+    @GET(ApiStrings.TASKS_PATH)
+    Call<Tasks> getAllTasks(@Query(ApiStrings.COUNT) int count, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 
-    @GET("/api/v1/tasks")
-    Call<Tasks> getEventTasks(@Query("event_id") long id, @Header("X-Firebase-Auth") String idToken);
-
-    @Headers({
-            "Accept: application/json",
-            "Content-Type: application/json"
-    })
-    @POST("/api/v1/tasks")
-    Call<Tasks> insert(@Query("event_id") Long event_id, @Body Task task, @Header("X-Firebase-Auth") String idToken);
+    @GET(ApiStrings.TASKS_PATH)
+    Call<Tasks> getEventTasks(@Query(ApiStrings.EVENT_ID) long id, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 
     @Headers({
-            "Accept: application/json",
-            "Content-Type: application/json"
+            ApiStrings.ACCEPT,
+            ApiStrings.CONTENT_TYPE
     })
-    @DELETE("/api/v1/tasks/{id}")
-    Call<Void> delete(@Path("id") Long id, @Header("X-Firebase-Auth") String idToken);
+    @POST(ApiStrings.TASKS_PATH)
+    Call<Tasks> insert(@Query(ApiStrings.EVENT_ID) Long event_id, @Body Task task, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 
     @Headers({
-            "Accept: application/json",
-            "Content-Type: application/json"
+            ApiStrings.ACCEPT,
+            ApiStrings.CONTENT_TYPE
     })
-    @PATCH("/api/v1/tasks/{id}")
-    Call<Tasks> update(@Path("id") Long id, @Body Task task, @Header("X-Firebase-Auth") String idToken);
+    @DELETE(ApiStrings.TASKS_ID_PATH)
+    Call<Void> delete(@Path(ApiStrings.ID) Long id, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
+
+    @Headers({
+            ApiStrings.ACCEPT,
+            ApiStrings.CONTENT_TYPE
+    })
+    @PATCH(ApiStrings.TASKS_ID_PATH)
+    Call<Tasks> update(@Path(ApiStrings.ID) Long id, @Body Task task, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 }

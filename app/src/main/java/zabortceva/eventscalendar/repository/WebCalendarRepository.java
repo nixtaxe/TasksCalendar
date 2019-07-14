@@ -128,7 +128,8 @@ public class WebCalendarRepository implements CalendarRepository {
         FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
-                eventsApi.getAllEvents(1000, task.getResult().getToken()).enqueue(new Callback<Events>() {
+                String idToken = task.getResult().getToken();
+                eventsApi.getAllEvents(1000, idToken).enqueue(new Callback<Events>() {
             @Override
             public void onResponse(Call<Events> call, Response<Events> response) {
                 if (response.body() != null) {
