@@ -36,7 +36,7 @@ public interface TasksApi {
             ApiStrings.CONTENT_TYPE
     })
     @DELETE(ApiStrings.TASKS_ID_PATH)
-    Call<Void> delete(@Path(ApiStrings.ID) Long id, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
+    Call<Tasks> delete(@Path(ApiStrings.ID) Long id, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 
     @Headers({
             ApiStrings.ACCEPT,

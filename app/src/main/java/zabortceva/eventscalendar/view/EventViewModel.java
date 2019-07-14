@@ -6,16 +6,14 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
-import java.util.Date;
 import java.util.List;
 
 import zabortceva.eventscalendar.localdata.Event;
-import zabortceva.eventscalendar.repository.CalendarRepository;
 import zabortceva.eventscalendar.repository.WebCalendarRepository;
 import zabortceva.eventscalendar.serverdata.Events;
 
 public class EventViewModel extends AndroidViewModel {
-    private CalendarRepository repository;
+    private WebCalendarRepository repository;
     private LiveData<List<Event>> allEvents;
 
     public EventViewModel(@NonNull Application application) {
@@ -24,7 +22,7 @@ public class EventViewModel extends AndroidViewModel {
         repository = WebCalendarRepository.getInstance();
     }
 
-    public LiveData<List<Event>> getStoredAllEvents() {return allEvents;}
+    public LiveData<List<Event>> getSavedAllEvents() {return allEvents;}
     public LiveData<List<Event>> getAllEvents() {
         allEvents = repository.getAllEvents();
         return allEvents;

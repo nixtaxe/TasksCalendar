@@ -1,5 +1,6 @@
 package zabortceva.eventscalendar.activity;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 
 import android.content.Intent;
@@ -220,15 +221,17 @@ public class CalendarActivity extends AppCompatActivity {
     }
 
     private void observeNewDay(Timestamp timestamp) {
-        if (taskViewModel.getDayTasks(taskViewModel.getSelectedDay()).hasObservers())
-            taskViewModel.getDayTasks(taskViewModel.getSelectedDay()).removeObserver(dayTasksObserver);
+        LiveData<List<Task>> dayTasks = taskViewModel.getSavedDayTasks();
+        if (dayTasks != null && dayTasks.hasObservers())
+            dayTasks.removeObserver(dayTasksObserver);
 
         taskViewModel.getDayTasks(timestamp).observe(this, dayTasksObserver);
     }
 
     private void observeBusyDays() {
-        if (taskViewModel.getAllBusyDays().hasActiveObservers())
-            taskViewModel.getAllBusyDays().removeObserver(busyDaysObserver);
+        LiveData<List<CalendarDay>> allBusyDays = taskViewModel.getSavedAllBusyDays();
+        if (allBusyDays != null && allBusyDays.hasObservers())
+            allBusyDays.removeObserver(busyDaysObserver);
 
         taskViewModel.getAllBusyDays().observe(this, busyDaysObserver);
     }
@@ -246,8 +249,6 @@ public class CalendarActivity extends AppCompatActivity {
             Task task = new Task(name, details, deadline_at);
             task.setEvent_id(event_id);
             taskViewModel.insert(task);
-
-            updateAllObservers();
 
             Toast.makeText(this, R.string.task_was_saved, Toast.LENGTH_SHORT).show();
         } else if (requestCode == EDIT_TASK_REQUEST && resultCode == RESULT_OK) {
@@ -272,6 +273,7 @@ public class CalendarActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, R.string.changes_was_not_saved, Toast.LENGTH_SHORT).show();
         }
+
     }
 
     public class EventDecorator implements DayViewDecorator {

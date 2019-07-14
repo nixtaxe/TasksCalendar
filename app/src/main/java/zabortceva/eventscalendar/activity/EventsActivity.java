@@ -1,7 +1,6 @@
 package zabortceva.eventscalendar.activity;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -108,7 +107,7 @@ public class EventsActivity extends AppCompatActivity {
     }
 
     public void updateEvents() {
-        LiveData<List<Event>> events = eventViewModel.getStoredAllEvents();
+        LiveData<List<Event>> events = eventViewModel.getSavedAllEvents();
         if (events != null && events.hasActiveObservers())
             events.removeObservers(this);
         eventViewModel.getAllEvents().observe(this, new Observer<List<Event>>() {
