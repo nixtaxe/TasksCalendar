@@ -24,7 +24,6 @@ public class EventViewModel extends AndroidViewModel {
         super(application);
 
         repository = WebCalendarRepository.getInstance(application);
-//        allEvents = repository.getAllEvents();
     }
 
     public void setIdToken(String idToken) {
@@ -32,7 +31,7 @@ public class EventViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<Event>> getAllEvents() {
-        return allEvents;
+        return repository.getAllEvents();
     }
     public LiveData<Events> insert(Event event) {
         return repository.insertEvent(event);

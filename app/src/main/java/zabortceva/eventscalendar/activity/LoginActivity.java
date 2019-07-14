@@ -1,7 +1,6 @@
 package zabortceva.eventscalendar.activity;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -26,15 +25,14 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.squareup.picasso.Picasso;
 
 import zabortceva.eventscalendar.R;
 
 public class LoginActivity extends AppCompatActivity {
-    public static final String PREFERENCES = "PREFERENCES";
-    public static final String TOKEN = "TOKEN";
+    private static final int RC_SIGN_IN = 1;
+
     SignInButton signInButton;
     FloatingActionButton signOutButton;
     FloatingActionButton openCalendarButton;
@@ -43,17 +41,14 @@ public class LoginActivity extends AppCompatActivity {
     TextView nameView;
     TextView emailView;
     ImageView photoView;
+
     private FirebaseAuth mAuth;
     FirebaseAuth.AuthStateListener mAuthListener;
-
-    private static final int RC_SIGN_IN = 1;
-
     GoogleSignInClient mGoogleSignInClient;
 
     @Override
     protected void onStart() {
         super.onStart();
-
         mAuth.addAuthStateListener(mAuthListener);
     }
 
@@ -109,6 +104,12 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         shareCalendarButton = findViewById(R.id.share_calendar_button);
+        shareCalendarButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(LoginActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public void signOut() {
@@ -120,10 +121,6 @@ public class LoginActivity extends AppCompatActivity {
                 new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-//                        SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCES, MODE_PRIVATE);
-//                        SharedPreferences.Editor editor = sharedPreferences.edit();
-//                        editor.putString(TOKEN, null);
-//                        editor.apply();
                     }
                 });
     }
@@ -149,7 +146,6 @@ public class LoginActivity extends AppCompatActivity {
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 e.printStackTrace();
-                // ...
             }
         }
     }
@@ -165,23 +161,11 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             FirebaseUser user = mAuth.getCurrentUser();
-                            user.getIdToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<GetTokenResult> task) {
-                                    SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCES, MODE_PRIVATE);
-                                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                                    String idToken = task.getResult().getToken();
-                                    editor.putString(TOKEN, idToken);
-                                    editor.apply();
-                                }
-                            });
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("TAG", "signInWithCredential:failure", task.getException());
                             Toast.makeText(LoginActivity.this, "Sign in failure", Toast.LENGTH_SHORT).show();
                         }
-
-                        // ...
                     }
                 });
 
@@ -191,7 +175,6 @@ public class LoginActivity extends AppCompatActivity {
         if (user != null) {
             nameView.setText(user.getDisplayName());
             emailView.setText(user.getEmail());
-
             Picasso.get().load(user.getPhotoUrl()).into(photoView);
 
             signInButton.setVisibility(View.GONE);
@@ -216,5 +199,14 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if (account == null) {
+            finish();
+        }
+    }
 }
 

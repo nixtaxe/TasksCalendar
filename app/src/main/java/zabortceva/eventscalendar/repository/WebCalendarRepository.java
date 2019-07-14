@@ -1,9 +1,11 @@
 package zabortceva.eventscalendar.repository;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 
 import java.sql.Timestamp;
@@ -28,6 +30,7 @@ import retrofit2.Retrofit;
 import zabortceva.eventscalendar.localdata.Event;
 import zabortceva.eventscalendar.localdata.Task;
 import zabortceva.eventscalendar.requests.EventsApi;
+import zabortceva.eventscalendar.requests.MyFirebaseMessagingService;
 import zabortceva.eventscalendar.requests.TasksApi;
 import zabortceva.eventscalendar.serverdata.Events;
 import zabortceva.eventscalendar.serverdata.ServerDatabase;
@@ -38,36 +41,18 @@ public class WebCalendarRepository implements CalendarRepository {
     private Retrofit serverDatabase;
     
     private TasksApi tasksApi;
-//    final private MutableLiveData<List<Task>> allTasks;
-//    final private MutableLiveData<List<Task>> dayTasks;
-//    final private MutableLiveData<List<CalendarDay>> busyDays;
-//    private Date selectedDay;
-
     private EventsApi eventsApi;
     private String idToken;
-//    final private MutableLiveData<List<Event>> allEvents;
+    private Context context;
 
     private WebCalendarRepository(Application app) {
+        context = app;
         serverDatabase = ServerDatabase.getInstance();
         tasksApi = ServerDatabase.getTasksTable();
         eventsApi = ServerDatabase.getEventsTable();
-//        allTasks = new MutableLiveData<>();//tasksApi.getAllTasks();
-//        busyDays = new MutableLiveData<>();//taskDao.getAllBusyDays();
-//
-//        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-//        selectedDay = new Date();
-//        try {
-//            selectedDay = formatter.parse(formatter.format(System.currentTimeMillis()));
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-//
-//        dayTasks = new MutableLiveData<>();//tasksApi.getDayTasks(0);//taskDao.getDayTasks(new Timestamp(selectedDay.getTime()));
-//
-//        allEvents = new MutableLiveData<>();
     }
 
-    public static WebCalendarRepository getInstance(Application app) {
+    public static synchronized WebCalendarRepository getInstance(Application app) {
         if (repository == null) {
             repository = new WebCalendarRepository(app);
         }
@@ -85,7 +70,7 @@ public class WebCalendarRepository implements CalendarRepository {
         tasksApi.insert(task.getEvent_id(), task, idToken).enqueue(new Callback<Tasks>() {
             @Override
             public void onResponse(Call<Tasks> call, Response<Tasks> response) {
-                //
+                Log.v("InsertTask", String.valueOf(response.code()));
             }
 
             @Override
@@ -129,13 +114,17 @@ public class WebCalendarRepository implements CalendarRepository {
     public LiveData<List<Event>> getAllEvents() {
         final MutableLiveData<List<Event>> data = new MutableLiveData<>();
 
-        eventsApi.getAllEvents(1000, idToken).enqueue(new Callback<Events>() {
+        String token = MyFirebaseMessagingService.getToken(context);
+
+        eventsApi.getAllEvents(1000, token).enqueue(new Callback<Events>() {
             @Override
             public void onResponse(Call<Events> call, Response<Events> response) {
-                if (response.body() != null)
+                if (response.body() != null) {
                     data.setValue(Arrays.asList(response.body().getData()));
+                    Log.v("GetAllEvents", String.valueOf(response.code()));
+                }
                 else {
-                    Log.v("GetAllEvents", "Null");
+                    Log.e("GetAllEvents", String.valueOf(response.code()));
                 }
             }
 
@@ -161,10 +150,12 @@ public class WebCalendarRepository implements CalendarRepository {
         eventsApi.getEventsByInterval(startOfDay, endOfDay, idToken).enqueue(new Callback<Events>() {
             @Override
             public void onResponse(Call<Events> call, Response<Events> response) {
-                if (response.body() != null)
+                if (response.body() != null) {
                     data.setValue(Arrays.asList(response.body().getData()));
+                    Log.v("GetDayEvents", String.valueOf(response.code()));
+                }
                 else {
-                    Log.v("GetDayTasks", "Null");
+                    Log.e("GetDayEvents", String.valueOf(response.code()));
                 }
             }
 
@@ -196,7 +187,9 @@ public class WebCalendarRepository implements CalendarRepository {
 
         final MutableLiveData<List<Task>> data = new MutableLiveData<>();
 
-        tasksApi.getAllTasks(1000, idToken).enqueue(new Callback<Tasks>() {
+        String token = MyFirebaseMessagingService.getToken(context);
+
+        tasksApi.getAllTasks(1000, token).enqueue(new Callback<Tasks>() {
             @Override
             public void onResponse(Call<Tasks> call, Response<Tasks> response) {
                 if (response.body() != null) {
@@ -214,9 +207,10 @@ public class WebCalendarRepository implements CalendarRepository {
                         }
                     });
                     data.setValue(dayTasks);
+                    Log.v("GetDayTasks", String.valueOf(response.code()));
                 }
                 else {
-                    Log.e("GetDayTasks", "Null");
+                    Log.wtf("GetDayTasks", String.valueOf(response.code()));
                 }
             }
 
@@ -236,10 +230,12 @@ public class WebCalendarRepository implements CalendarRepository {
         tasksApi.getAllTasks(1000, idToken).enqueue(new Callback<Tasks>() {
             @Override
             public void onResponse(Call<Tasks> call, Response<Tasks> response) {
-                if (response.body() != null)
+                if (response.body() != null) {
                     data.setValue(Arrays.asList(response.body().getData()));
+                    Log.v("GetAllTasks", String.valueOf(response.code()));
+                }
                 else {
-                    Log.v("GetAllTasks", "Null");
+                    Log.wtf("GetAllTasks", String.valueOf(response.code()));
                 }
             }
 
@@ -265,9 +261,9 @@ public class WebCalendarRepository implements CalendarRepository {
                         days.add(new CalendarDay(new Date(task.getDeadline_at())));
                     }
                     data.setValue(days);
-                    Log.v("GetAllTasks", "OK");
+                    Log.v("GetBusyDays", String.valueOf(response.code()));
                 } else {
-                    Log.v("GetAllTasks", "Null");
+                    Log.wtf("GetBusyDays", String.valueOf(response.code()));
                 }
             }
 
@@ -289,9 +285,9 @@ public class WebCalendarRepository implements CalendarRepository {
             public void onResponse(Call<Events> call, Response<Events> response) {
                 if (response.body() != null) {
                     data.setValue(response.body());
-                    Log.v("InsertEvent", "OK");
+                    Log.v("InsertEvent", String.valueOf(response.code()));
                 } else {
-                    Log.v("InsertEvent", "Null");
+                    Log.e("InsertEvent", String.valueOf(response.code()));
                 }
             }
 
@@ -314,7 +310,7 @@ public class WebCalendarRepository implements CalendarRepository {
                 if (response.body() != null) {
                     data.setValue(response.body().getData()[0]);
                 } else {
-                    Log.v("GetEventById", "Null");
+                    Log.v("GetEventById", String.valueOf(response.code()));
                 }
             }
 

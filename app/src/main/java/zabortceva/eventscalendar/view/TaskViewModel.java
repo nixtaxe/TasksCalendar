@@ -26,9 +26,7 @@ public class TaskViewModel extends AndroidViewModel {
         super(application);
 
         repository = WebCalendarRepository.getInstance(application);
-//        allTasks = repository.getAllTasks();
         selectedDay = new Date(System.currentTimeMillis());
-//        busyDays = repository.getAllBusyDays();
     }
 
     public void setIdToken(String idToken) {
@@ -48,28 +46,18 @@ public class TaskViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<Task>> getDayTasks(Timestamp timestamp) {
-//        final int EQUAL_DATES = 0;
         Date day = new Date(timestamp.getTime());
-//        if (dayTasks != null && day.compareTo(selectedDay) == EQUAL_DATES)
-//            return dayTasks;
-//
         selectedDay = day;
-//        dayTasks = repository.getDayTasks(timestamp);
-//        return dayTasks;
         return repository.getDayTasks(timestamp);
     }
 
     public Timestamp getSelectedDay() {return new Timestamp(selectedDay.getTime());}
 
     public LiveData<List<Task>> getAllTasks() {
-//        allTasks = repository.getAllTasks();
-//        return allTasks;
         return repository.getAllTasks();
     }
 
     public LiveData<List<CalendarDay>> getAllBusyDays() {
-//        busyDays = repository.getAllBusyDays();
-//        return busyDays;
         return repository.getAllBusyDays();
     }
 }
