@@ -25,8 +25,10 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.squareup.picasso.Picasso;
+import com.victor.loading.rotate.RotateLoading;
 
 import zabortceva.eventscalendar.R;
 
@@ -42,20 +44,20 @@ public class LoginActivity extends AppCompatActivity {
     TextView emailView;
     ImageView photoView;
 
+    RotateLoading rotateLoading;
+
     private FirebaseAuth mAuth;
     FirebaseAuth.AuthStateListener mAuthListener;
     GoogleSignInClient mGoogleSignInClient;
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
-    }
-
-    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_screen);
+
+        rotateLoading = findViewById(R.id.rotateloading);
+        switchLoading();
+
         welcomeText = findViewById(R.id.welcome_text);
 
         signInButton = findViewById(R.id.sign_in_button);
@@ -110,6 +112,35 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(LoginActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
             }
         });
+
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        if (account != null)
+            refreshToken();
+
+        switchLoading();
+    }
+
+    private void refreshToken() {
+        mAuth.getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+            @Override
+            public void onComplete(@NonNull Task<GetTokenResult> task) {
+                Log.d("Token", "Refreshed");
+            }
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+
+    private void switchLoading() {
+        if (rotateLoading.isStart()) {
+            rotateLoading.stop();
+        } else {
+            rotateLoading.start();
+        }
     }
 
     public void signOut() {
@@ -127,6 +158,7 @@ public class LoginActivity extends AppCompatActivity {
 
     public void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        switchLoading();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
@@ -166,12 +198,14 @@ public class LoginActivity extends AppCompatActivity {
                             Log.w("TAG", "signInWithCredential:failure", task.getException());
                             Toast.makeText(LoginActivity.this, "Sign in failure", Toast.LENGTH_SHORT).show();
                         }
+
+                        switchLoading();
                     }
                 });
-
     }
 
     private void updateUI(FirebaseUser user) {
+        switchLoading();
         if (user != null) {
             nameView.setText(user.getDisplayName());
             emailView.setText(user.getEmail());
@@ -197,6 +231,7 @@ public class LoginActivity extends AppCompatActivity {
             signInButton.setVisibility(View.VISIBLE);
             welcomeText.setVisibility(View.VISIBLE);
         }
+        switchLoading();
     }
 
     @Override

@@ -13,7 +13,7 @@ import zabortceva.eventscalendar.requests.TasksApi;
 public abstract class ServerDatabase {
     private final static String BASE_URL = "http://planner.skillmasters.ga/";
 
-    private static Retrofit retrofit = null;
+    private static Retrofit retrofit;
 
     public abstract TasksApi taskApi();
 
@@ -42,10 +42,12 @@ public abstract class ServerDatabase {
     }
 
     public static TasksApi getTasksTable() {
+        Retrofit retrofit = ServerDatabase.getInstance();
         return retrofit.create(TasksApi.class);
     }
 
     public static EventsApi getEventsTable() {
+        Retrofit retrofit = ServerDatabase.getInstance();
         return retrofit.create(EventsApi.class);
     }
 }

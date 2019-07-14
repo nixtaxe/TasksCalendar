@@ -17,21 +17,17 @@ import zabortceva.eventscalendar.serverdata.Events;
 public class EventViewModel extends AndroidViewModel {
     private CalendarRepository repository;
     private LiveData<List<Event>> allEvents;
-    private LiveData<List<Event>> dayEvents;
-    private Date selectedDay;
 
     public EventViewModel(@NonNull Application application) {
         super(application);
 
-        repository = WebCalendarRepository.getInstance(application);
+        repository = WebCalendarRepository.getInstance();
     }
 
-    public void setIdToken(String idToken) {
-        repository.setIdToken(idToken);
-    }
-
+    public LiveData<List<Event>> getStoredAllEvents() {return allEvents;}
     public LiveData<List<Event>> getAllEvents() {
-        return repository.getAllEvents();
+        allEvents = repository.getAllEvents();
+        return allEvents;
     }
     public LiveData<Events> insert(Event event) {
         return repository.insertEvent(event);

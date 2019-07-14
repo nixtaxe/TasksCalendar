@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -83,6 +84,7 @@ public class EventsActivity extends AppCompatActivity {
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 eventViewModel.delete(eventsAdapter.getEventAt(viewHolder.getAdapterPosition()));
                 Toast.makeText(EventsActivity.this, R.string.task_was_deleted, Toast.LENGTH_SHORT).show();
+                updateEvents();
             }
         }).attachToRecyclerView(eventsView);
 
@@ -105,6 +107,18 @@ public class EventsActivity extends AppCompatActivity {
         });
     }
 
+    public void updateEvents() {
+        LiveData<List<Event>> events = eventViewModel.getStoredAllEvents();
+        if (events != null && events.hasActiveObservers())
+            events.removeObservers(this);
+        eventViewModel.getAllEvents().observe(this, new Observer<List<Event>>() {
+            @Override
+            public void onChanged(List<Event> events) {
+                eventsAdapter.submitList(events);
+            }
+        });
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -119,8 +133,9 @@ public class EventsActivity extends AppCompatActivity {
             eventViewModel.insert(event).observe(this, new Observer<Events>() {
                 @Override
                 public void onChanged(Events result) {
-                    if (result.isSuccess())
+                    if (result.isSuccess()) {
                         Log.v("InsertEvent", "OK");
+                    }
                     else
                         Log.e("InsertEvent", result.getMessage());;
                 }
@@ -148,6 +163,8 @@ public class EventsActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, R.string.changes_was_not_saved, Toast.LENGTH_SHORT).show();
         }
+
+        updateEvents();
     }
 
     private TextView selectedDate;

@@ -95,30 +95,6 @@ public class CalendarActivity extends AppCompatActivity {
         };
         taskViewModel.getAllBusyDays().observe(this, busyDaysObserver);
 
-//        taskViewModel.getAllTasks().observe(this, new Observer<List<Task>>() {
-//            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-//            @Override
-//            public void onChanged(List<Task> tasks) {
-//                Task task = tasks.get(tasks.size() - 1);
-//                Calendar c = Calendar.getInstance();
-//                c.set(Calendar.HOUR, task.getDeadline_at().getHours());
-//                c.set(Calendar.MINUTE, task.getDeadline_at().getMinutes());
-//                c.set(Calendar.SECOND, 0);
-//
-//                if (c.before(Calendar.getInstance())) {
-//                    return;
-//                }
-//
-//                AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-//                Intent intent = new Intent(CalendarActivity.this, AlertReceiver.class);
-//                intent.putExtra(AddEditTaskActivity.EXTRA_TASK_NAME, task.getName());
-//                intent.putExtra(AddEditTaskActivity.EXTRA_TASK_DETAILS, task.getDetails());
-//                PendingIntent pendingIntent = PendingIntent.getBroadcast(CalendarActivity.this, 1, intent, 0);
-//
-//                alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
-//            }
-//        });
-
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
 
@@ -181,7 +157,7 @@ public class CalendarActivity extends AppCompatActivity {
             }
         });
 
-        eventViewModel = ViewModelProviders.of(this).get(EventViewModel.class);
+//        eventViewModel = ViewModelProviders.of(this).get(EventViewModel.class);
 //        events = new ArrayList<>();
 //        eventViewModel.getAllEvents().observe(this, new Observer<List<Event>>() {
 //            @Override
@@ -212,6 +188,30 @@ public class CalendarActivity extends AppCompatActivity {
             }
         });
 
+//        Notifications
+//        taskViewModel.getAllTasks().observe(this, new Observer<List<Task>>() {
+//            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+//            @Override
+//            public void onChanged(List<Task> tasks) {
+//                Task task = tasks.get(tasks.size() - 1);
+//                Calendar c = Calendar.getInstance();
+//                c.set(Calendar.HOUR, task.getDeadline_at().getHours());
+//                c.set(Calendar.MINUTE, task.getDeadline_at().getMinutes());
+//                c.set(Calendar.SECOND, 0);
+//
+//                if (c.before(Calendar.getInstance())) {
+//                    return;
+//                }
+//
+//                AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+//                Intent intent = new Intent(CalendarActivity.this, AlertReceiver.class);
+//                intent.putExtra(AddEditTaskActivity.EXTRA_TASK_NAME, task.getName());
+//                intent.putExtra(AddEditTaskActivity.EXTRA_TASK_DETAILS, task.getDetails());
+//                PendingIntent pendingIntent = PendingIntent.getBroadcast(CalendarActivity.this, 1, intent, 0);
+//
+//                alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
+//            }
+//        });
     }
 
     private void updateAllObservers() {
