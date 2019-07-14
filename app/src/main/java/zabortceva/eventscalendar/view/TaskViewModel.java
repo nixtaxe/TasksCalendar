@@ -28,7 +28,7 @@ public class TaskViewModel extends AndroidViewModel {
         super(application);
 
         repository = WebCalendarRepository.getInstance();
-        selectedDay = new Date(System.currentTimeMillis());
+        selectedDay = getDay(new Timestamp(System.currentTimeMillis()));
     }
 
     public Date getDay(Timestamp timestamp) {

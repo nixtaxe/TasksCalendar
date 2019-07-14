@@ -25,21 +25,21 @@ public interface EventsApi {
     Call<Events> getAllEvents(@Query(ApiStrings.COUNT) int count, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 
     @Headers({
-            ApiStrings.ACCEPT,
+            ApiStrings.ACCEPT_JSON,
             ApiStrings.CONTENT_TYPE
     })
     @POST(ApiStrings.EVENTS_PATH)
     Call<Events> insert(@Body Event event, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 
     @Headers({
-            ApiStrings.ACCEPT,
+            ApiStrings.ACCEPT_JSON,
             ApiStrings.CONTENT_TYPE
     })
     @DELETE(ApiStrings.EVENTS_ID_PATH)
     Call<Events> delete(@Path(ApiStrings.ID) long id, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 
     @Headers({
-            ApiStrings.ACCEPT,
+            ApiStrings.ACCEPT_JSON,
             ApiStrings.CONTENT_TYPE
     })
     @PATCH(ApiStrings.EVENTS_ID_PATH)

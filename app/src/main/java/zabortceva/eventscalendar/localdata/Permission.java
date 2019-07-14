@@ -15,14 +15,14 @@ public class Permission {
     @Expose
     private String user_id;
     @Expose
-    private Long entity_id;
+    private String entity_id;
     @Expose
     private String name;
 
     public Permission() {
     }
 
-    public Permission(String user_id, Long entity_id, String name) {
+    public Permission(String user_id, String entity_id, String name) {
         this.user_id = user_id;
         this.entity_id = entity_id;
         this.name = name;
@@ -68,11 +68,11 @@ public class Permission {
         this.user_id = user_id;
     }
 
-    public Long getEntity_id() {
+    public String getEntity_id() {
         return entity_id;
     }
 
-    public void setEntity_id(Long entity_id) {
+    public void setEntity_id(String entity_id) {
         this.entity_id = entity_id;
     }
 

@@ -25,21 +25,21 @@ public interface TasksApi {
     Call<Tasks> getEventTasks(@Query(ApiStrings.EVENT_ID) long id, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 
     @Headers({
-            ApiStrings.ACCEPT,
+            ApiStrings.ACCEPT_JSON,
             ApiStrings.CONTENT_TYPE
     })
     @POST(ApiStrings.TASKS_PATH)
     Call<Tasks> insert(@Query(ApiStrings.EVENT_ID) Long event_id, @Body Task task, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 
     @Headers({
-            ApiStrings.ACCEPT,
+            ApiStrings.ACCEPT_JSON,
             ApiStrings.CONTENT_TYPE
     })
     @DELETE(ApiStrings.TASKS_ID_PATH)
     Call<Tasks> delete(@Path(ApiStrings.ID) Long id, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 
     @Headers({
-            ApiStrings.ACCEPT,
+            ApiStrings.ACCEPT_JSON,
             ApiStrings.CONTENT_TYPE
     })
     @PATCH(ApiStrings.TASKS_ID_PATH)
