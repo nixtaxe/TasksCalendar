@@ -29,4 +29,8 @@ public class PermissionViewModel extends AndroidViewModel {
         allPermissions = repository.getAllPermissions(entity_type);
         return allPermissions;
     }
+
+    public void insertPermission(String user_id, String entity_type, String action) {
+        repository.insertPermission(user_id, entity_type, action);
+    }
 }

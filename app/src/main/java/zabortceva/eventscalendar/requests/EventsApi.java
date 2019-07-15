@@ -44,4 +44,6 @@ public interface EventsApi {
     })
     @PATCH(ApiStrings.EVENTS_ID_PATH)
     Call<Events> update(@Path(ApiStrings.ID) long id, @Body Event event, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
+
+
 }

@@ -28,9 +28,15 @@
     <string name="title_activity_share">ShareActivity</string>
     <string name="permission_name">Permission name</string>
     <string name="user_name">User name</string>
+    <string name="result_string">Result: </string>
     <string-array name="entity_types">
         <item>ENTITY</item>
         <item>PATTERN</item>
         <item>TASK</item>
+    </string-array>
+    <string-array name="actions">
+        <item>READ</item>
+        <item>UPDATE</item>
+        <item>DELETE</item>
     </string-array>
 </resources>

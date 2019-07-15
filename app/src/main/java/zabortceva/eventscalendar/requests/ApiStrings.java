@@ -23,6 +23,7 @@ public interface ApiStrings {
     public static final String PERMISSIONS_PATH = "/api/v1/permissions";
     public static final String PERMISSIONS_ID_PATH = "/api/v1/permissions/{id}";
     public static final String GRANT_PERMISSION_PATH = "/api/v1/grant";
+    public static final String USER_PATH = "/api/v1/user";
 
     //Param strings
     public static final String ID = "id";
@@ -35,6 +36,7 @@ public interface ApiStrings {
     public static final String TO = "to";
     public static final String TOKEN = "token";
     public static final String PERMISSIONS = "permissions";
+    public static final String EMAIL = "email";
 
     public static final String ENTITY_TYPE = "entity_type";
     public interface ENTITY_TYPE_OPTIONS {

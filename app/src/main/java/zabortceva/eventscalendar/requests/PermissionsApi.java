@@ -10,18 +10,19 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 import zabortceva.eventscalendar.localdata.Permission;
 import zabortceva.eventscalendar.serverdata.Permissions;
+import zabortceva.eventscalendar.serverdata.User;
 
 public interface PermissionsApi {
 
     @GET(ApiStrings.GRANT_PERMISSION_PATH)
-    Call<Void> grant(@Query(ApiStrings.USER_ID) String user_id, @Query(ApiStrings.ENTITY_ID) long entity_id, @Query(ApiStrings.ENTITY_TYPE) String entity_type,
+    Call<Void> grant(@Query(ApiStrings.USER_ID) String user_id, @Query(ApiStrings.ENTITY_ID) String entity_id, @Query(ApiStrings.ENTITY_TYPE) String entity_type,
                      @Query(ApiStrings.ACTION) String action, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 
     @Headers({
             ApiStrings.ACCEPT_TEXT
     })
     @GET(ApiStrings.SHARE_PATH)
-    Call<String> shareOne(@Query(ApiStrings.ENTITY_ID) long entity_id, @Query(ApiStrings.ENTITY_TYPE) String entity_type,
+    Call<String> shareOne(@Query(ApiStrings.ENTITY_ID) String entity_id, @Query(ApiStrings.ENTITY_TYPE) String entity_type,
                        @Query(ApiStrings.ACTION) String action, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 
     @POST(ApiStrings.SHARE_PATH)
@@ -41,4 +42,10 @@ public interface PermissionsApi {
     })
     @DELETE(ApiStrings.PERMISSIONS_ID_PATH)
     Call<Permissions> revokePermission(@Path(ApiStrings.ID) long id, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
+
+    @Headers({
+            ApiStrings.ACCEPT_JSON
+    })
+    @GET(ApiStrings.USER_PATH)
+    Call<User> findUser(@Query(ApiStrings.EMAIL) String email, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 }

@@ -37,6 +37,7 @@ import zabortceva.eventscalendar.serverdata.Events;
 import zabortceva.eventscalendar.serverdata.Permissions;
 import zabortceva.eventscalendar.serverdata.ServerDatabase;
 import zabortceva.eventscalendar.serverdata.Tasks;
+import zabortceva.eventscalendar.serverdata.User;
 
 public class WebCalendarRepository {
     private static WebCalendarRepository repository;
@@ -432,5 +433,50 @@ public class WebCalendarRepository {
         });
 
         return data;
+    }
+
+    public void insertPermission(final String user_id, final String entity_type, final String action) {
+        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+            @Override
+            public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
+                final String idToken = task.getResult().getToken();
+                if (user_id == null)
+                    permissionsApi.shareOne(idToken, entity_type, action, idToken).enqueue(new Callback<String>() {
+                        @Override
+                        public void onResponse(Call<String> call, Response<String> response) {
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<String> call, Throwable t) {
+
+                        }
+                    });
+                else {
+                    permissionsApi.findUser(user_id, idToken).enqueue(new Callback<User>() {
+                        @Override
+                        public void onResponse(Call<User> call, Response<User> response) {
+                            String user_id = response.body().getId();
+                            permissionsApi.grant(user_id, idToken, entity_type, action, idToken).enqueue(new Callback<Void>() {
+                                @Override
+                                public void onResponse(Call<Void> call, Response<Void> response) {
+
+                                }
+
+                                @Override
+                                public void onFailure(Call<Void> call, Throwable t) {
+
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onFailure(Call<User> call, Throwable t) {
+
+                        }
+                    });
+                }
+            }
+        });
     }
 }

@@ -1,5 +1,6 @@
 package zabortceva.eventscalendar.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -34,6 +35,7 @@ public class ShareActivity extends AppCompatActivity {
     private RecyclerView permissionsView;
     private PermissionViewModel permissionViewModel;
     private Observer<List<Permission>> permissionsObserver;
+    private FloatingActionButton addPermission;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +77,14 @@ public class ShareActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent)
             {
 
+            }
+        });
+
+        addPermission = findViewById(R.id.add_permission_button);
+        addPermission.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(ShareActivity.this, AddEditPermissionActivity.class));
             }
         });
     }
