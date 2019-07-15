@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.Objects;
+
 import zabortceva.eventscalendar.R;
 import zabortceva.eventscalendar.localdata.Event;
 
@@ -23,12 +25,12 @@ public class EventsAdapter extends ListAdapter<Event, EventsAdapter.EventViewHol
     private static final DiffUtil.ItemCallback<Event> DIFF_CALLBACK = new DiffUtil.ItemCallback<Event>() {
         @Override
         public boolean areItemsTheSame(@NonNull Event event, @NonNull Event t1) {
-            return event.getId() == t1.getId();
+            return Objects.equals(event.getId(), t1.getId());
         }
 
         @Override
         public boolean areContentsTheSame(@NonNull Event event, @NonNull Event t1) {
-            return true;
+            return false;
         }
     };
 

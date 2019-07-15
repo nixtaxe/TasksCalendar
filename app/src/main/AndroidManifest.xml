@@ -12,28 +12,39 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:usesCleartextTraffic="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true"
         tools:replace="android:appComponentFactory">
-
-        <activity android:name="zabortceva.eventscalendar.activity.AddEditTaskActivity"
-            android:parentActivityName="zabortceva.eventscalendar.activity.CalendarActivity"/>
-        <activity android:name="zabortceva.eventscalendar.activity.EventsActivity"
-            android:parentActivityName="zabortceva.eventscalendar.activity.CalendarActivity"/>
-        <activity android:name="zabortceva.eventscalendar.activity.AddEditEventActivity"
-            android:parentActivityName="zabortceva.eventscalendar.activity.EventsActivity"/>
-        <activity android:name="zabortceva.eventscalendar.activity.CalendarActivity"></activity>
-        <activity android:name="zabortceva.eventscalendar.activity.LoginActivity"
+        <activity android:name=".activity.AddEditPermissionActivity"></activity>
+        <activity
+            android:name=".activity.ShareActivity"
+            android:label="@string/title_activity_share"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activity.AddEditTaskActivity"
+            android:parentActivityName=".activity.CalendarActivity" />
+        <activity
+            android:name=".activity.EventsActivity"
+            android:parentActivityName=".activity.CalendarActivity" />
+        <activity
+            android:name=".activity.AddEditEventActivity"
+            android:parentActivityName=".activity.EventsActivity" />
+        <activity android:name=".activity.CalendarActivity" />
+        <activity
+            android:name=".activity.LoginActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name="zabortceva.eventscalendar.view.AlertReceiver"/>
+
+        <receiver android:name=".view.AlertReceiver" />
+
         <service
-            android:name="zabortceva.eventscalendar.requests.MyFirebaseMessagingService"
+            android:name=".requests.MyFirebaseMessagingService"
             android:stopWithTask="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

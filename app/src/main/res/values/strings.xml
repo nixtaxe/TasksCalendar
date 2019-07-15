@@ -21,4 +21,16 @@
         completions."
     </string>
     <string name="server_client_id" translatable="false">683480740903-atpdqv9v1sk69uimo07gcjj5jgq55pf5.apps.googleusercontent.com</string>
+    <string name="default_button_text">Button text</string>
+    <string name="share_calendar">Share calendar</string>
+    <string name="view_permissions">View permissions granted by you</string>
+    <string name="time">Time</string>
+    <string name="title_activity_share">ShareActivity</string>
+    <string name="permission_name">Permission name</string>
+    <string name="user_name">User name</string>
+    <string-array name="entity_types">
+        <item>ENTITY</item>
+        <item>PATTERN</item>
+        <item>TASK</item>
+    </string-array>
 </resources>

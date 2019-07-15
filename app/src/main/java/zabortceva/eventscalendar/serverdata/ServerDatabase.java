@@ -7,7 +7,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import zabortceva.eventscalendar.localdata.Permission;
 import zabortceva.eventscalendar.requests.EventsApi;
+import zabortceva.eventscalendar.requests.PermissionsApi;
 import zabortceva.eventscalendar.requests.TasksApi;
 
 public abstract class ServerDatabase {
@@ -26,7 +28,7 @@ public abstract class ServerDatabase {
         if (retrofit == null) {
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
             // set your desired log level
-            logging.setLevel(HttpLoggingInterceptor.Level.HEADERS);
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
             OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
             // add your other interceptors …
             // add logging as last interceptor
@@ -41,13 +43,18 @@ public abstract class ServerDatabase {
         return retrofit;
     }
 
-    public static TasksApi getTasksTable() {
+    public static TasksApi getTasksApi() {
         Retrofit retrofit = ServerDatabase.getInstance();
         return retrofit.create(TasksApi.class);
     }
 
-    public static EventsApi getEventsTable() {
+    public static EventsApi getEventsApi() {
         Retrofit retrofit = ServerDatabase.getInstance();
         return retrofit.create(EventsApi.class);
+    }
+
+    public static PermissionsApi getPermissionsApi() {
+        Retrofit retrofit = ServerDatabase.getInstance();
+        return retrofit.create(PermissionsApi.class);
     }
 }

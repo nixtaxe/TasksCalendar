@@ -105,11 +105,13 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        shareCalendarButton = findViewById(R.id.share_calendar_button);
+        shareCalendarButton = findViewById(R.id.share_menu_button);
         shareCalendarButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(LoginActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(LoginActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(LoginActivity.this, ShareActivity.class));
+                finish();
             }
         });
 

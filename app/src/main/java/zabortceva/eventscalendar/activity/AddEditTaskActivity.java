@@ -31,7 +31,7 @@ import java.util.Objects;
 import zabortceva.eventscalendar.R;
 import zabortceva.eventscalendar.localdata.Event;
 import zabortceva.eventscalendar.view.DatePickerFragment;
-import zabortceva.eventscalendar.view.EventViewModel;
+import zabortceva.eventscalendar.view.model.EventViewModel;
 import zabortceva.eventscalendar.view.EventsSpinnerAdapter;
 import zabortceva.eventscalendar.view.TimePickerFragment;
 

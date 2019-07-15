@@ -25,7 +25,7 @@ import java.util.List;
 import zabortceva.eventscalendar.R;
 import zabortceva.eventscalendar.localdata.Event;
 import zabortceva.eventscalendar.serverdata.Events;
-import zabortceva.eventscalendar.view.EventViewModel;
+import zabortceva.eventscalendar.view.model.EventViewModel;
 import zabortceva.eventscalendar.view.EventsAdapter;
 
 public class EventsActivity extends AppCompatActivity {

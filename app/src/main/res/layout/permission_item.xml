@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="8dp"
+    android:layout_marginLeft="8dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginRight="8dp"
+    android:layout_marginTop="8dp"
+    >
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/permission_created_time"
+            android:text="@string/time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"/>
+
+        <View
+            android:id="@+id/permission_divider"
+            android:layout_weight="1"
+            android:background="?android:attr/listDivider"
+            android:layout_height="60dp"
+            android:layout_width="3dp"
+            android:layout_toEndOf="@id/permission_created_time"
+            android:layout_toRightOf="@id/permission_created_time"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginEnd="8dp"/>
+
+        <TextView
+            android:id="@+id/permission_name"
+            android:text="@string/permission_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/permission_divider"
+            android:layout_toRightOf="@id/permission_divider"
+            android:ellipsize="end"
+            android:maxLines="1"
+            style="@style/TextAppearance.AppCompat.Large"/>
+
+        <TextView
+            android:id="@+id/user_name"
+            android:text="@string/user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/permission_divider"
+            android:layout_toRightOf="@id/permission_divider"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:layout_below="@id/permission_name"/>
+
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

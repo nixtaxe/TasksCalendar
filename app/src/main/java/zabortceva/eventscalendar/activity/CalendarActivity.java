@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -35,8 +34,8 @@ import com.prolificinteractive.materialcalendarview.spans.DotSpan;
 
 import zabortceva.eventscalendar.R;
 import zabortceva.eventscalendar.localdata.Task;
-import zabortceva.eventscalendar.view.EventViewModel;
-import zabortceva.eventscalendar.view.TaskViewModel;
+import zabortceva.eventscalendar.view.model.EventViewModel;
+import zabortceva.eventscalendar.view.model.TaskViewModel;
 import zabortceva.eventscalendar.view.TasksAdapter;
 
 public class CalendarActivity extends AppCompatActivity {

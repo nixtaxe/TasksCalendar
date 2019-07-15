@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/share_button"
+        android:layout_width="@dimen/share_menu_button_width"
+        android:layout_height="wrap_content"
+        android:background="@color/colorAccent"
+        android:textColor="@color/buttonText"
+        android:text="@string/share_calendar"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/view_permissions_button"
+        android:layout_width="@dimen/share_menu_button_width"
+        android:layout_height="wrap_content"
+        android:background="@color/colorAccent"
+        android:textColor="@color/buttonText"
+        android:text="@string/view_permissions"
+        android:layout_below="@+id/share_button"
+        android:layout_margin="8sp"
+        android:layout_centerHorizontal="true"/>
+
+</RelativeLayout>

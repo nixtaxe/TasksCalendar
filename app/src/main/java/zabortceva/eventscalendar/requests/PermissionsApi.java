@@ -13,6 +13,10 @@ import zabortceva.eventscalendar.serverdata.Permissions;
 
 public interface PermissionsApi {
 
+    @GET(ApiStrings.GRANT_PERMISSION_PATH)
+    Call<Void> grant(@Query(ApiStrings.USER_ID) String user_id, @Query(ApiStrings.ENTITY_ID) long entity_id, @Query(ApiStrings.ENTITY_TYPE) String entity_type,
+                     @Query(ApiStrings.ACTION) String action, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
+
     @Headers({
             ApiStrings.ACCEPT_TEXT
     })
@@ -24,7 +28,7 @@ public interface PermissionsApi {
     Call<String> shareMultiple(@Query(ApiStrings.PERMISSIONS) Permission[] permissions, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 
     @GET(ApiStrings.SHARE_TOKEN_PATH)
-    Call<Void> getSharedToYou(@Path(ApiStrings.TOKEN) String token, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
+    Call<Permissions> getSharedToYou(@Path(ApiStrings.TOKEN) String token, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 
     @Headers({
             ApiStrings.ACCEPT_JSON
