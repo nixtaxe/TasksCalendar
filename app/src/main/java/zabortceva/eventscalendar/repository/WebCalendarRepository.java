@@ -441,7 +441,7 @@ public class WebCalendarRepository {
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
                 final String idToken = task.getResult().getToken();
                 if (user_id == null)
-                    permissionsApi.shareOne(idToken, entity_type, action, idToken).enqueue(new Callback<String>() {
+                    permissionsApi.shareOne(null, entity_type, action, idToken).enqueue(new Callback<String>() {
                         @Override
                         public void onResponse(Call<String> call, Response<String> response) {
 
@@ -457,7 +457,7 @@ public class WebCalendarRepository {
                         @Override
                         public void onResponse(Call<User> call, Response<User> response) {
                             String user_id = response.body().getId();
-                            permissionsApi.grant(user_id, idToken, entity_type, action, idToken).enqueue(new Callback<Void>() {
+                            permissionsApi.grant(user_id, null, entity_type, action, idToken).enqueue(new Callback<Void>() {
                                 @Override
                                 public void onResponse(Call<Void> call, Response<Void> response) {
 

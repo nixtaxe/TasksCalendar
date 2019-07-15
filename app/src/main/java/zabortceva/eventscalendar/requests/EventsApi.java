@@ -12,6 +12,7 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 import zabortceva.eventscalendar.localdata.Event;
 import zabortceva.eventscalendar.serverdata.Events;
+import zabortceva.eventscalendar.serverdata.Instances;
 
 public interface EventsApi {
 
@@ -45,5 +46,9 @@ public interface EventsApi {
     @PATCH(ApiStrings.EVENTS_ID_PATH)
     Call<Events> update(@Path(ApiStrings.ID) long id, @Body Event event, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 
-
+    @Headers({
+            ApiStrings.ACCEPT_JSON
+    })
+    @GET(ApiStrings.INSTANCES_PATH)
+    Call<Instances> getInstances(@Query(ApiStrings.FROM) long from, @Query(ApiStrings.TO) long to);
 }

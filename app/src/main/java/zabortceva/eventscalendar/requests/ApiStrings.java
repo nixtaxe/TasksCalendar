@@ -9,11 +9,12 @@ public interface ApiStrings {
 
     //Tasks path strings
     public static final String TASKS_PATH = "api/v1/tasks";
-    public static final String TASKS_ID_PATH = "api/v1/tasks/{id}";
+    public static final String TASKS_ID_PATH = TASKS_PATH + "/{id}";
 
     //Events path strings
     public static final String EVENTS_PATH = "/api/v1/events";
-    public static final String EVENTS_ID_PATH = "/api/v1/events/{id}";
+    public static final String EVENTS_ID_PATH = EVENTS_PATH + "/{id}";
+    public static final String INSTANCES_PATH = "/api/v1/events/instances";
 
     //Share path strings
     public static final String SHARE_PATH = "/api/v1/share";
@@ -21,9 +22,13 @@ public interface ApiStrings {
 
     //Permission path strings
     public static final String PERMISSIONS_PATH = "/api/v1/permissions";
-    public static final String PERMISSIONS_ID_PATH = "/api/v1/permissions/{id}";
+    public static final String PERMISSIONS_ID_PATH = PERMISSIONS_PATH + "/{id}";
     public static final String GRANT_PERMISSION_PATH = "/api/v1/grant";
     public static final String USER_PATH = "/api/v1/user";
+
+    //Patterns path strings
+    public static final String PATTERNS_PATH = "/api/v1/patterns";
+    public static final String PATTERNS_ID_PATH = PATTERNS_PATH + "/{id}";
 
     //Param strings
     public static final String ID = "id";
@@ -37,6 +42,7 @@ public interface ApiStrings {
     public static final String TOKEN = "token";
     public static final String PERMISSIONS = "permissions";
     public static final String EMAIL = "email";
+    public static final String PATTERN = "pattern";
 
     public static final String ENTITY_TYPE = "entity_type";
     public interface ENTITY_TYPE_OPTIONS {
