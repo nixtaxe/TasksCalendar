@@ -30,9 +30,10 @@
         <activity
             android:name=".activity.AddEditEventActivity"
             android:parentActivityName=".activity.EventsActivity" />
-        <activity android:name=".activity.CalendarActivity" />
+        <activity android:name=".activity.LoginActivity"
+            android:parentActivityName=".activity.CalendarActivity"/>
         <activity
-            android:name=".activity.LoginActivity"
+            android:name=".activity.CalendarActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

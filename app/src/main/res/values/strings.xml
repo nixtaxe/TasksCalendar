@@ -39,4 +39,5 @@
         <item>UPDATE</item>
         <item>DELETE</item>
     </string-array>
+    <string name="not_signed_in">You are not signed in</string>
 </resources>

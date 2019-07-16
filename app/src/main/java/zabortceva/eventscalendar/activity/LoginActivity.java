@@ -238,12 +238,12 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if (account == null) {
-            finish();
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            Toast.makeText(this, R.string.not_signed_in, Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        super.onBackPressed();
     }
 }
 

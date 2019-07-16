@@ -25,6 +25,7 @@ import androidx.lifecycle.ViewModelProviders;
 
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
@@ -64,6 +65,16 @@ public class CalendarActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.calendar_layout);
+
+        viewAccountButton = findViewById(R.id.view_account_button);
+        viewAccountButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(CalendarActivity.this, LoginActivity.class));
+            }
+        });
+        if (FirebaseAuth.getInstance().getCurrentUser() == null)
+            viewAccountButton.performClick();
 
         tasksView = findViewById(R.id.tasksView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -177,14 +188,6 @@ public class CalendarActivity extends AppCompatActivity {
                 intent.putStringArrayListExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME, events);
 
                 startActivity(intent);
-            }
-        });
-
-        viewAccountButton = findViewById(R.id.view_account_button);
-        viewAccountButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(CalendarActivity.this, LoginActivity.class));
             }
         });
 
