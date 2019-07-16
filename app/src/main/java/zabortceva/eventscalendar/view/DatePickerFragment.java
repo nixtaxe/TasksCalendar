@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import zabortceva.eventscalendar.activity.AddEditEventActivity;
 import zabortceva.eventscalendar.activity.AddEditTaskActivity;
 
 public class DatePickerFragment extends DialogFragment {
@@ -24,9 +25,9 @@ public class DatePickerFragment extends DialogFragment {
     @Override
     public void setArguments(@Nullable Bundle args) {
         super.setArguments(args);
-        year = args.getInt(AddEditTaskActivity.EXTRA_TASK_DEADLINE_YEAR);
-        month = args.getInt(AddEditTaskActivity.EXTRA_TASK_DEADLINE_MONTH);
-        day = args.getInt(AddEditTaskActivity.EXTRA_TASK_DEADLINE_DAY);
+        year = args.getInt(AddEditEventActivity.EXTRA_YEAR);
+        month = args.getInt(AddEditEventActivity.EXTRA_MONTH);
+        day = args.getInt(AddEditEventActivity.EXTRA_DAY);
     }
 
     @NonNull

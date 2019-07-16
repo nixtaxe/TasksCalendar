@@ -35,6 +35,10 @@ import zabortceva.eventscalendar.view.model.EventViewModel;
 import zabortceva.eventscalendar.view.EventsSpinnerAdapter;
 import zabortceva.eventscalendar.view.TimePickerFragment;
 
+import static zabortceva.eventscalendar.activity.AddEditEventActivity.EXTRA_DAY;
+import static zabortceva.eventscalendar.activity.AddEditEventActivity.EXTRA_MONTH;
+import static zabortceva.eventscalendar.activity.AddEditEventActivity.EXTRA_YEAR;
+
 public class AddEditTaskActivity extends AppCompatActivity {
 
     public static final String EXTRA_TASK_EVENTS_NAME = "zabortceva.eventscalendar.EXTRA_TASK_EVENTS_NAME";
@@ -96,9 +100,9 @@ public class AddEditTaskActivity extends AppCompatActivity {
                 DatePickerFragment datePicker = new DatePickerFragment();
 
                 Bundle args = new Bundle();
-                args.putInt(EXTRA_TASK_DEADLINE_YEAR, c.get(Calendar.YEAR));
-                args.putInt(EXTRA_TASK_DEADLINE_MONTH, c.get(Calendar.MONTH));
-                args.putInt(EXTRA_TASK_DEADLINE_DAY, c.get(Calendar.DAY_OF_MONTH));
+                args.putInt(EXTRA_YEAR, c.get(Calendar.YEAR));
+                args.putInt(EXTRA_MONTH, c.get(Calendar.MONTH));
+                args.putInt(EXTRA_DAY, c.get(Calendar.DAY_OF_MONTH));
                 datePicker.setArguments(args);
 
                 datePicker.setCallback(onDeadlineAtDay);

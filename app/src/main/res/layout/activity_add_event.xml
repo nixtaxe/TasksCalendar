@@ -1,51 +1,266 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:id="@+id/event_form"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_above="@id/save_event_button"
         android:orientation="vertical"
-        android:padding="16dp"
-        android:layout_above="@id/save_event_button">
+        android:padding="8dp">
+
+        <TextView
+            style="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/event_name"
+            android:visibility="gone" />
 
         <EditText
             android:id="@+id/edit_event_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Event name"
+            android:hint="@string/event_name"
             android:inputType="text" />
+
+        <TextView
+            style="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/event_name"
+            android:visibility="gone" />
 
         <EditText
             android:id="@+id/edit_event_details"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Event description"
+            android:hint="@string/event_details"
             android:inputType="text" />
+
+        <TextView
+            style="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/event_name"
+            android:visibility="gone" />
 
         <EditText
             android:id="@+id/edit_event_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Event description"
+            android:hint="@string/event_location"
             android:inputType="text" />
+
+        <TextView
+            style="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/event_name"
+            android:visibility="gone" />
 
         <EditText
             android:id="@+id/edit_event_status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Event status"
+            android:hint="@string/event_status"
             android:inputType="text" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:text="@string/starts_at"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:text="@string/ends_at"
+                    android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/starts_at_day"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:hint="Select date" />
+
+                <TextView
+                    android:id="@+id/ends_at_day"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="11dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:hint="Select date" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/starts_at_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:hint="Select time" />
+
+                <TextView
+                    android:id="@+id/ends_at_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="11dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:hint="Select time" />
+                <!--android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"/>-->
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Spinner
+                    android:id="@+id/pattern_spinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:entries="@array/pattern_options"
+                    android:dropDownVerticalOffset = "8dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Every" />
+
+                <EditText
+                    android:id="@+id/every_x"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    style="@style/TextAppearance.AppCompat.Medium"
+                    android:textSize="15dp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/weekdays"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ToggleButton
+                        android:id="@+id/monday"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textOff="@string/monday"
+                        android:textOn="@string/monday" />
+
+                    <ToggleButton
+                        android:id="@+id/tuesday"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textOff="@string/tuesday"
+                        android:textOn="@string/tuesday" />
+
+                    <ToggleButton
+                        android:id="@+id/wednesday"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textOff="@string/wednesday"
+                        android:textOn="@string/wednesday" />
+
+                    <ToggleButton
+                        android:id="@+id/thursday"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textOff="@string/thursday"
+                        android:textOn="@string/thursday" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ToggleButton
+                        android:id="@+id/friday"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textOff="@string/friday"
+                        android:textOn="@string/friday" />
+
+                    <ToggleButton
+                        android:id="@+id/saturday"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textOff="@string/saturday"
+                        android:textOn="@string/saturday" />
+
+                    <ToggleButton
+                        android:id="@+id/sunday"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textOff="@string/sunday"
+                        android:textOn="@string/sunday" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+
     </LinearLayout>
+
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/save_event_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_save"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_margin="8dp"/>
+        android:layout_margin="8dp"
+        android:src="@drawable/ic_save" />
 
 </RelativeLayout>

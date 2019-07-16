@@ -82,6 +82,12 @@ dependencies {
 
     //Loading screen
     implementation 'com.victor:lib:1.0.4'
+
+    // https://mvnrepository.com/artifact/org.scala-saddle/google-rfc-2445
+    implementation group: 'org.scala-saddle', name: 'google-rfc-2445', version: '20110304'
+
+    // https://mvnrepository.com/artifact/org.dmfs/lib-recur
+    implementation group: 'org.dmfs', name: 'lib-recur', version: '0.10.2'
 }
 
 apply plugin: 'com.google.gms.google-services'

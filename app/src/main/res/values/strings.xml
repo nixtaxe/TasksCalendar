@@ -3,6 +3,7 @@
     <string name="date">Date</string>
     <string name="title_activity_login">Sign in</string>
     <!--Strings related to toasts-->
+    <string name="event_was_saved">Event was saved</string>
     <string name="task_was_saved">Task was saved</string>
     <string name="task_was_updated">Task was updated</string>
     <string name="task_was_deleted">Task was deleted</string>
@@ -40,4 +41,23 @@
         <item>DELETE</item>
     </string-array>
     <string name="not_signed_in">You are not signed in</string>
+    <string name="event_name">Event name</string>
+    <string name="event_details">Event details</string>
+    <string name="event_location">Event location</string>
+    <string name="event_status">Event status</string>
+    <string name="starts_at">Starts at</string>
+    <string name="ends_at">Ends at</string>
+    <string-array name="pattern_options">
+        <item>Daily</item>
+        <item>Weekly</item>
+        <item>Monthly</item>
+        <item>Yearly</item>
+    </string-array>
+    <string name="monday">Mon</string>
+    <string name="tuesday">Tue</string>
+    <string name="wednesday">Wed</string>
+    <string name="thursday">Thu</string>
+    <string name="friday">Fri</string>
+    <string name="saturday">Sat</string>
+    <string name="sunday">Sun</string>
 </resources>

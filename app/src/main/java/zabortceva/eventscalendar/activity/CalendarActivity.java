@@ -26,6 +26,7 @@ import androidx.lifecycle.ViewModelProviders;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.gson.Gson;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
@@ -34,14 +35,22 @@ import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.prolificinteractive.materialcalendarview.spans.DotSpan;
 
 import zabortceva.eventscalendar.R;
+import zabortceva.eventscalendar.localdata.Event;
+import zabortceva.eventscalendar.localdata.Pattern;
 import zabortceva.eventscalendar.localdata.Task;
+import zabortceva.eventscalendar.repository.WebCalendarRepository;
+import zabortceva.eventscalendar.serverdata.Events;
+import zabortceva.eventscalendar.serverdata.Patterns;
 import zabortceva.eventscalendar.view.model.EventViewModel;
 import zabortceva.eventscalendar.view.model.TaskViewModel;
 import zabortceva.eventscalendar.view.TasksAdapter;
 
+import static zabortceva.eventscalendar.activity.AddEditEventActivity.EXTRA_EVENT;
+import static zabortceva.eventscalendar.activity.AddEditEventActivity.EXTRA_PATTERN;
+
 public class CalendarActivity extends AppCompatActivity {
 
-    public static final int ADD_TASK_REQUEST = 1;
+    public static final int ADD_EVENT_REQUEST = 1;
     public static final int EDIT_TASK_REQUEST = 2;
 
     //TODO adjust insertion into table
@@ -158,17 +167,15 @@ public class CalendarActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(CalendarActivity.this, AddEditTaskActivity.class);
-
-                Timestamp dateTime = new Timestamp(calendarView.getSelectedDate().getDate().getTime());
-                intent.putExtra(AddEditTaskActivity.EXTRA_TASK_DEADLINE_AT, dateTime.toString());
-                intent.putStringArrayListExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME, events);
-
-                startActivityForResult(intent, ADD_TASK_REQUEST);
+                Intent intent = new Intent(CalendarActivity.this, AddEditEventActivity.class);
+//                Timestamp dateTime = new Timestamp(calendarView.getSelectedDate().getDate().getTime());
+//                intent.putExtra(AddEditTaskActivity.EXTRA_TASK_DEADLINE_AT, dateTime.toString());
+//                intent.putStringArrayListExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME, events);
+                startActivityForResult(intent, ADD_EVENT_REQUEST);
             }
         });
 
-//        eventViewModel = ViewModelProviders.of(this).get(EventViewModel.class);
+        eventViewModel = ViewModelProviders.of(this).get(EventViewModel.class);
 //        events = new ArrayList<>();
 //        eventViewModel.getAllEvents().observe(this, new Observer<List<Event>>() {
 //            @Override
@@ -238,21 +245,41 @@ public class CalendarActivity extends AppCompatActivity {
         taskViewModel.getAllBusyDays().observe(this, busyDaysObserver);
     }
 
+    Observer<Events> responseObserver = new Observer<Events>() {
+        @Override
+        public void onChanged(Events response) {
+            if (response.isSuccess()) {
+
+                Toast.makeText(CalendarActivity.this, R.string.event_was_saved, Toast.LENGTH_SHORT).show();
+                updateAllObservers();
+            }
+            else
+                Toast.makeText(CalendarActivity.this, R.string.changes_was_not_saved, Toast.LENGTH_SHORT).show();
+        }
+    };
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == ADD_TASK_REQUEST && resultCode == RESULT_OK) {
-            long event_id = data.getLongExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME, -1);
-            String name = data.getStringExtra(AddEditTaskActivity.EXTRA_TASK_NAME);
-            String details = data.getStringExtra(AddEditTaskActivity.EXTRA_TASK_DETAILS);
-            Timestamp deadline_at = Timestamp.valueOf(data.getStringExtra(AddEditTaskActivity.EXTRA_TASK_DEADLINE_AT));
+        if (requestCode == ADD_EVENT_REQUEST && resultCode == RESULT_OK) {
+            final Event event = (new Gson()).fromJson(data.getStringExtra(EXTRA_EVENT), Event.class);
+            final Pattern pattern = (new Gson()).fromJson(data.getStringExtra(EXTRA_PATTERN), Pattern.class);
+            eventViewModel.insert(event).observe(this, new Observer<Events>() {
+                @Override
+                public void onChanged(Events events) {
+                    if (events.isSuccess()) {
+                        WebCalendarRepository.getInstance().insertPattern(events.getData()[0].getId(), pattern).observe(CalendarActivity.this, new Observer<Patterns>() {
+                            @Override
+                            public void onChanged(Patterns patterns) {
+                                if (patterns.isSuccess())
+                                    Toast.makeText(CalendarActivity.this, "Pattern inserted", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }
+            });
 
-            Task task = new Task(name, details, deadline_at);
-            task.setEvent_id(event_id);
-            taskViewModel.insert(task);
-
-            Toast.makeText(this, R.string.task_was_saved, Toast.LENGTH_SHORT).show();
         } else if (requestCode == EDIT_TASK_REQUEST && resultCode == RESULT_OK) {
             long id = data.getLongExtra(AddEditTaskActivity.EXTRA_TASK_ID, -1);
             if (id == -1) {

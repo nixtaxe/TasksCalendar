@@ -9,6 +9,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import zabortceva.eventscalendar.localdata.Permission;
 import zabortceva.eventscalendar.requests.EventsApi;
+import zabortceva.eventscalendar.requests.PatternsApi;
 import zabortceva.eventscalendar.requests.PermissionsApi;
 import zabortceva.eventscalendar.requests.TasksApi;
 
@@ -56,5 +57,10 @@ public abstract class ServerDatabase {
     public static PermissionsApi getPermissionsApi() {
         Retrofit retrofit = ServerDatabase.getInstance();
         return retrofit.create(PermissionsApi.class);
+    }
+
+    public static PatternsApi getPatternsApi() {
+        Retrofit retrofit = ServerDatabase.getInstance();
+        return retrofit.create(PatternsApi.class);
     }
 }

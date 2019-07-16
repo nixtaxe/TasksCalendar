@@ -10,6 +10,9 @@ import androidx.fragment.app.DialogFragment;
 
 import zabortceva.eventscalendar.activity.AddEditTaskActivity;
 
+import static zabortceva.eventscalendar.activity.AddEditEventActivity.EXTRA_HOUR;
+import static zabortceva.eventscalendar.activity.AddEditEventActivity.EXTRA_MINUTE;
+
 public class TimePickerFragment extends DialogFragment {
     TimePickerDialog.OnTimeSetListener onTimeSet;
     private int hour, minutes;
@@ -24,8 +27,8 @@ public class TimePickerFragment extends DialogFragment {
     @Override
     public void setArguments(@Nullable Bundle args) {
         super.setArguments(args);
-        hour = args.getInt(AddEditTaskActivity.EXTRA_TASK_DEADLINE_HOUR);
-        minutes = args.getInt(AddEditTaskActivity.EXTRA_TASK_DEADLINE_MINUTES);
+        hour = args.getInt(EXTRA_HOUR);
+        minutes = args.getInt(EXTRA_MINUTE);
     }
 
     @NonNull

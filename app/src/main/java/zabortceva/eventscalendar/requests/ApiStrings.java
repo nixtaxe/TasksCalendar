@@ -42,7 +42,14 @@ public interface ApiStrings {
     public static final String TOKEN = "token";
     public static final String PERMISSIONS = "permissions";
     public static final String EMAIL = "email";
+
     public static final String PATTERN = "pattern";
+    public interface PATTERN_OPTIONS {
+        public static final String DAILY = "Daily";
+        public static final String WEEKLY = "Weekly";
+        public static final String MONTHLY = "Monthly";
+        public static final String YEARLY = "Yearly";
+    }
 
     public static final String ENTITY_TYPE = "entity_type";
     public interface ENTITY_TYPE_OPTIONS {

@@ -28,12 +28,15 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import zabortceva.eventscalendar.localdata.Event;
+import zabortceva.eventscalendar.localdata.Pattern;
 import zabortceva.eventscalendar.localdata.Permission;
 import zabortceva.eventscalendar.localdata.Task;
 import zabortceva.eventscalendar.requests.EventsApi;
+import zabortceva.eventscalendar.requests.PatternsApi;
 import zabortceva.eventscalendar.requests.PermissionsApi;
 import zabortceva.eventscalendar.requests.TasksApi;
 import zabortceva.eventscalendar.serverdata.Events;
+import zabortceva.eventscalendar.serverdata.Patterns;
 import zabortceva.eventscalendar.serverdata.Permissions;
 import zabortceva.eventscalendar.serverdata.ServerDatabase;
 import zabortceva.eventscalendar.serverdata.Tasks;
@@ -46,12 +49,14 @@ public class WebCalendarRepository {
     private TasksApi tasksApi;
     private EventsApi eventsApi;
     private PermissionsApi permissionsApi;
+    private PatternsApi patternsApi;
 
     private WebCalendarRepository() {
         serverDatabase = ServerDatabase.getInstance();
         tasksApi = ServerDatabase.getTasksApi();
         eventsApi = ServerDatabase.getEventsApi();
         permissionsApi = ServerDatabase.getPermissionsApi();
+        patternsApi = ServerDatabase.getPatternsApi();
     }
 
     public static synchronized WebCalendarRepository getInstance() {
@@ -417,7 +422,7 @@ public class WebCalendarRepository {
                     @Override
                     public void onResponse(Call<Permissions> call, Response<Permissions> response) {
                         if (response.body() != null) {
-                                data.setValue(Arrays.asList(response.body().getData()));
+                            data.setValue(Arrays.asList(response.body().getData()));
                             Log.v("GetAllPermissions", String.valueOf(response.code()));
                         } else {
                             Log.e("GetAllPermissions", String.valueOf(response.code()));
@@ -479,4 +484,29 @@ public class WebCalendarRepository {
             }
         });
     }
+
+    public LiveData<Patterns> insertPattern(final long event_id, final Pattern pattern) {
+        final MutableLiveData<Patterns> data = new MutableLiveData<>();
+
+        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+            @Override
+            public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
+                String idToken = task.getResult().getToken();
+                patternsApi.insertPattern(event_id, pattern, idToken).enqueue(new Callback<Patterns>() {
+                    @Override
+                    public void onResponse(Call<Patterns> call, Response<Patterns> response) {
+                        data.setValue(response.body());
+                    }
+
+                    @Override
+                    public void onFailure(Call<Patterns> call, Throwable t) {
+
+                    }
+                });
+            }
+        });
+
+        return data;
+    }
+
 }
