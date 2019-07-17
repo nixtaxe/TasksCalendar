@@ -38,7 +38,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.Objects;
+import java.util.TimeZone;
 
 import zabortceva.eventscalendar.R;
 import zabortceva.eventscalendar.localdata.Event;
@@ -81,6 +85,7 @@ public class AddEditEventActivity extends AppCompatActivity {
     private TextView endsAtTime;
 
     private Spinner patternSpinner;
+    private Spinner timezoneSpinner;
 
     private Calendar c = Calendar.getInstance();
 
@@ -217,19 +222,59 @@ public class AddEditEventActivity extends AppCompatActivity {
             editEventStatus.setText(event.getStatus());
         }
 
-        if (intent.hasExtra(EXTRA_PATTERN)) {
-            Pattern pattern = (new Gson()).fromJson(intent.getStringExtra(EXTRA_PATTERN), Pattern.class);
-            RRule rule = null;
-            try {
-                rule = new RRule("RRULE:" + pattern.getRrule());
-            } catch (ParseException e) {
-                e.printStackTrace();
+        timezoneSpinner = findViewById(R.id.timezone_spinner);
+        final ArrayList<String> timezones = new ArrayList<>();
+
+        String[] ids = TimeZone.getAvailableIDs();
+        for (int i = 0; i < ids.length; i++) {
+            TimeZone d = TimeZone.getTimeZone(ids[i]);
+            if (!ids[i].matches(".*/.*")) {
+                continue;
             }
-            String frequency = rule.getFreq().name();
-            int pattern_pos = patternsAdapter.getPosition(frequency);
-            patternSpinner.setSelection(pattern_pos);
+
+            timezones.add(prettifyTimezone(ids[i]));
         }
 
+        Collections.sort(timezones);
+
+        ArrayAdapter<String> timezonesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, timezones);
+        timezonesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
+        timezoneSpinner.setAdapter(timezonesAdapter);
+
+        if (intent.hasExtra(EXTRA_PATTERN)) {
+            Pattern pattern = (new Gson()).fromJson(intent.getStringExtra(EXTRA_PATTERN), Pattern.class);
+            if (pattern.getRrule() != null && !Objects.equals(pattern.getRrule(), "")) {
+                RRule rule = null;
+                try {
+                    rule = new RRule("RRULE:" + pattern.getRrule());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                String frequency = rule.getFreq().name();
+                int pattern_pos = patternsAdapter.getPosition(frequency);
+                patternSpinner.setSelection(pattern_pos);
+            } else {
+                int pattern_pos = patternsAdapter.getPosition(ApiStrings.PATTERN_OPTIONS.ONCE);
+                patternSpinner.setSelection(pattern_pos);
+            }
+            int pattern_pos = timezonesAdapter.getPosition(prettifyTimezone(pattern.getTimezone()));
+            timezoneSpinner.setSelection(pattern_pos);
+        }
+
+    }
+
+    private String prettifyTimezone(String id) {
+        TimeZone d = TimeZone.getTimeZone(id);
+        if (!id.matches(".*/.*")) {
+            return id;
+        }
+        String region = id.replaceAll(".*/", "").replaceAll("_", " ");
+        int hours = Math.abs(d.getRawOffset()) / 3600000;
+        int minutes = Math.abs(d.getRawOffset() / 60000) % 60;
+        String sign = d.getRawOffset() >= 0 ? "+" : "-";
+
+        String timeZonePretty = String.format("(UTC %s %02d:%02d) %s", sign, hours, minutes, region);
+        return timeZonePretty;
     }
 
     DatePickerDialog.OnDateSetListener onEndsAtDay = new DatePickerDialog.OnDateSetListener() {
@@ -338,6 +383,8 @@ public class AddEditEventActivity extends AppCompatActivity {
         }
         pattern.setEnded_at(timestamp.getTime());
         pattern.setDuration(pattern.getEnded_at() - pattern.getStarted_at());
+
+        pattern.setTimezone(timezoneSpinner.getSelectedItem().toString());
 
         RRule rule = new RRule();
         rule.setWkSt(Weekday.MO);
