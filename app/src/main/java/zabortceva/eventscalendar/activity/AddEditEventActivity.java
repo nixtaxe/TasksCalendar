@@ -337,6 +337,7 @@ public class AddEditEventActivity extends AppCompatActivity {
             return;
         }
         pattern.setEnded_at(timestamp.getTime());
+        pattern.setDuration(pattern.getEnded_at() - pattern.getStarted_at());
 
         RRule rule = new RRule();
         rule.setWkSt(Weekday.MO);
@@ -344,9 +345,11 @@ public class AddEditEventActivity extends AppCompatActivity {
         EditText everyX = findViewById(R.id.every_x);
         int x = Integer.valueOf(everyX.getText().toString());
         rule.setInterval(x);
+        EditText xTimes = findViewById(R.id.x_times);
+        x = Integer.valueOf(xTimes.getText().toString());
+        rule.setCount(x);
         String stRule = rule.toIcal().substring(6);
         pattern.setRrule(stRule);
-        //Long.MAX_VALUE - 1 to Ended_at
 
         data.putExtra(EXTRA_EVENT, (new Gson()).toJson(event));
         data.putExtra(EXTRA_PATTERN, (new Gson()).toJson(pattern));

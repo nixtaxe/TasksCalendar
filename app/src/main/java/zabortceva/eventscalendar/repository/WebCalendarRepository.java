@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 
@@ -50,6 +51,7 @@ import zabortceva.eventscalendar.serverdata.User;
 
 public class WebCalendarRepository {
     private static WebCalendarRepository repository;
+    private FirebaseAuth auth;
 
     private TasksApi tasksApi;
     private EventsApi eventsApi;
@@ -61,6 +63,8 @@ public class WebCalendarRepository {
         eventsApi = ServerDatabase.getEventsApi();
         permissionsApi = ServerDatabase.getPermissionsApi();
         patternsApi = ServerDatabase.getPatternsApi();
+        
+        auth = FirebaseAuth.getInstance();
     }
 
     public static synchronized WebCalendarRepository getInstance() {
@@ -74,7 +78,7 @@ public class WebCalendarRepository {
     public LiveData<Tasks> insertTask(final Task newTask) {
         final MutableLiveData<Tasks> data = new MutableLiveData<>();
 
-        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+        auth.getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
                 tasksApi.insert(newTask.getEvent_id(), newTask, task.getResult().getToken()).enqueue(new Callback<Tasks>() {
@@ -103,7 +107,7 @@ public class WebCalendarRepository {
     public LiveData<Tasks> updateTask(final Task current_task) {
         final MutableLiveData<Tasks> data = new MutableLiveData<>();
 
-        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+        auth.getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
                 String idToken = task.getResult().getToken();
@@ -132,7 +136,7 @@ public class WebCalendarRepository {
     public LiveData<Tasks> deleteTask(final Task current_task) {
         final MutableLiveData<Tasks> data = new MutableLiveData<>();
 
-        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+        auth.getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
                 String idToken = task.getResult().getToken();
@@ -158,7 +162,7 @@ public class WebCalendarRepository {
     public LiveData<List<Event>> getAllEvents() {
         final MutableLiveData<List<Event>> data = new MutableLiveData<>();
 
-        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+        auth.getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
                 String idToken = task.getResult().getToken();
@@ -202,7 +206,7 @@ public class WebCalendarRepository {
 
         final MutableLiveData<List<Event>> data = new MutableLiveData<>();
 
-        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+        auth.getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
                 String idToken = task.getResult().getToken();
@@ -254,7 +258,7 @@ public class WebCalendarRepository {
 
         final MutableLiveData<List<FullEvent>> data = new MutableLiveData<>();
 
-        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+        auth.getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
                 final String idToken = task.getResult().getToken();
@@ -361,7 +365,7 @@ public class WebCalendarRepository {
 
         final MutableLiveData<List<Task>> data = new MutableLiveData<>();
 
-        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+        auth.getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
                 String idToken = task.getResult().getToken();
@@ -403,7 +407,7 @@ public class WebCalendarRepository {
     public LiveData<List<Task>> getAllTasks() {
         final MutableLiveData<List<Task>> data = new MutableLiveData<>();
 
-        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+        auth.getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
                 String idToken = task.getResult().getToken();
@@ -431,7 +435,7 @@ public class WebCalendarRepository {
     public LiveData<List<CalendarDay>> getAllBusyDays() {
         final MutableLiveData<List<CalendarDay>> data = new MutableLiveData<>();
 
-        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+        auth.getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
                 String idToken = task.getResult().getToken();
@@ -464,7 +468,7 @@ public class WebCalendarRepository {
     public LiveData<Events> insertEvent(final Event event) {
         final MutableLiveData<Events> data = new MutableLiveData<>();
 
-        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+        auth.getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
                 String idToken = task.getResult().getToken();
@@ -493,7 +497,7 @@ public class WebCalendarRepository {
     public LiveData<Event> getEventById(final long id) {
         final MutableLiveData<Event> data = new MutableLiveData<>();
 
-        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+        auth.getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
                 String idToken = task.getResult().getToken();
@@ -521,7 +525,7 @@ public class WebCalendarRepository {
     public LiveData<Events> deleteEvent(final Event event) {
         final MutableLiveData<Events> data = new MutableLiveData<>();
 
-        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+        auth.getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
                 String idToken = task.getResult().getToken();
@@ -550,7 +554,7 @@ public class WebCalendarRepository {
     public LiveData<Events> updateEvent(final Event event) {
         final MutableLiveData<Events> data = new MutableLiveData<>();
 
-        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+        auth.getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
                 String idToken = task.getResult().getToken();
@@ -577,7 +581,7 @@ public class WebCalendarRepository {
     public LiveData<List<Permission>> getAllPermissions(final String entity_type) {
         final MutableLiveData<List<Permission>> data = new MutableLiveData<>();
 
-        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+        auth.getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
                 String idToken = task.getResult().getToken();
@@ -604,7 +608,7 @@ public class WebCalendarRepository {
     }
 
     public void insertPermission(final String user_id, final String entity_type, final String action) {
-        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+        auth.getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
                 final String idToken = task.getResult().getToken();
@@ -651,7 +655,7 @@ public class WebCalendarRepository {
     public LiveData<Pattern> getPatternById(final long id) {
         final MutableLiveData<Pattern> data = new MutableLiveData<>();
 
-        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+        auth.getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
                 String idToken = task.getResult().getToken();
@@ -675,7 +679,7 @@ public class WebCalendarRepository {
     public LiveData<Patterns> insertPattern(final long event_id, final Pattern pattern) {
         final MutableLiveData<Patterns> data = new MutableLiveData<>();
 
-        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+        auth.getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
                 String idToken = task.getResult().getToken();
@@ -699,7 +703,7 @@ public class WebCalendarRepository {
     public LiveData<Patterns> updatePattern(final Pattern pattern) {
         final MutableLiveData<Patterns> data = new MutableLiveData<>();
 
-        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+        auth.getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
                 String idToken = task.getResult().getToken();
@@ -723,7 +727,7 @@ public class WebCalendarRepository {
     public LiveData<Patterns> deletePattern(final long id) {
         final MutableLiveData<Patterns> data = new MutableLiveData<>();
 
-        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+        auth.getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
                 String idToken = task.getResult().getToken();
