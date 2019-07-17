@@ -47,7 +47,6 @@ import zabortceva.eventscalendar.serverdata.User;
 
 public class WebCalendarRepository {
     private static WebCalendarRepository repository;
-    private Retrofit serverDatabase;
 
     private TasksApi tasksApi;
     private EventsApi eventsApi;
@@ -55,7 +54,6 @@ public class WebCalendarRepository {
     private PatternsApi patternsApi;
 
     private WebCalendarRepository() {
-        serverDatabase = ServerDatabase.getInstance();
         tasksApi = ServerDatabase.getTasksApi();
         eventsApi = ServerDatabase.getEventsApi();
         permissionsApi = ServerDatabase.getPermissionsApi();

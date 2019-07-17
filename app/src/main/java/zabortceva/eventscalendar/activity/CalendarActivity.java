@@ -44,6 +44,7 @@ import zabortceva.eventscalendar.serverdata.Patterns;
 import zabortceva.eventscalendar.view.EventsAdapter;
 import zabortceva.eventscalendar.view.model.EventViewModel;
 import zabortceva.eventscalendar.view.TasksAdapter;
+import zabortceva.eventscalendar.view.model.PatternViewModel;
 
 import static zabortceva.eventscalendar.activity.AddEditEventActivity.EXTRA_EVENT;
 import static zabortceva.eventscalendar.activity.AddEditEventActivity.EXTRA_PATTERN;
@@ -64,12 +65,14 @@ public class CalendarActivity extends AppCompatActivity {
     private EventDecorator busyDaysDecorator = new EventDecorator(0, new ArrayList<CalendarDay>());
 
     private EventViewModel eventViewModel;
+    private PatternViewModel patternViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.calendar_layout);
         eventViewModel = ViewModelProviders.of(this).get(EventViewModel.class);
+        patternViewModel = ViewModelProviders.of(this).get(PatternViewModel.class);
 
         viewAccountButton = findViewById(R.id.view_account_button);
         viewAccountButton.setOnClickListener(new View.OnClickListener() {
@@ -205,25 +208,37 @@ public class CalendarActivity extends AppCompatActivity {
                 @Override
                 public void onChanged(Events events) {
                     if (events.isSuccess()) {
-                        WebCalendarRepository.getInstance().insertPattern(events.getData()[0].getId(), pattern).observe(CalendarActivity.this, new Observer<Patterns>() {
+                        patternViewModel.insert(events.getData()[0].getId(), pattern).observe(CalendarActivity.this, new Observer<Patterns>() {
                             @Override
                             public void onChanged(Patterns patterns) {
-                                if (patterns.isSuccess())
+                                if (patterns.isSuccess()) {
                                     Toast.makeText(CalendarActivity.this, "Pattern inserted", Toast.LENGTH_SHORT).show();
+                                    updateAllObservers();
+                                }
                             }
                         });
                     }
                 }
             });
-
         } else if (requestCode == EDIT_EVENT_REQUEST && resultCode == RESULT_OK) {
             final Event event = (new Gson()).fromJson(data.getStringExtra(EXTRA_EVENT), Event.class);
             final Pattern pattern = (new Gson()).fromJson(data.getStringExtra(EXTRA_PATTERN), Pattern.class);
-            eventViewModel.update(event);
-
-            updateAllObservers();
-
-            Toast.makeText(this, R.string.task_was_updated, Toast.LENGTH_SHORT).show();
+            eventViewModel.update(event).observe(this, new Observer<Events>() {
+                @Override
+                public void onChanged(Events events) {
+                    if (events.isSuccess()) {
+                        patternViewModel.update(pattern).observe(CalendarActivity.this, new Observer<Patterns>() {
+                            @Override
+                            public void onChanged(Patterns patterns) {
+                                if (patterns.isSuccess()) {
+                                    Toast.makeText(CalendarActivity.this, "Event updated", Toast.LENGTH_SHORT).show();
+                                    updateAllObservers();
+                                }
+                            }
+                        });
+                    }
+                }
+            });
         } else {
             Toast.makeText(this, R.string.changes_was_not_saved, Toast.LENGTH_SHORT).show();
         }

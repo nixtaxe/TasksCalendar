@@ -45,6 +45,7 @@ public interface ApiStrings {
 
     public static final String PATTERN = "pattern";
     public interface PATTERN_OPTIONS {
+        public static final String ONCE = "Once";
         public static final String DAILY = "Daily";
         public static final String WEEKLY = "Weekly";
         public static final String MONTHLY = "Monthly";

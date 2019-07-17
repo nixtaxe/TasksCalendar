@@ -159,25 +159,62 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Repeats"
+                    style="@style/TextAppearance.AppCompat.Medium"
+                    android:layout_marginHorizontal="8dp"
+                    android:layout_marginVertical="8dp"/>
+
                 <Spinner
                     android:id="@+id/pattern_spinner"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:entries="@array/pattern_options"
-                    android:dropDownVerticalOffset = "8dp"/>
+                    android:dropDownVerticalOffset = "8dp"
+                    android:layout_marginVertical="8dp"/>
 
-                <TextView
+                <LinearLayout
+                    android:id="@+id/freq_and_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Every" />
+                    android:orientation="horizontal">
 
-                <EditText
-                    android:id="@+id/every_x"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"
-                    style="@style/TextAppearance.AppCompat.Medium"
-                    android:textSize="15dp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Every"
+                        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
+
+                    <EditText
+                        android:id="@+id/every_x"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal"
+                        style="@style/TextAppearance.AppCompat.Medium"
+                        android:text="1"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                        android:text=", "/>
+
+                    <EditText
+                        android:id="@+id/x_times"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/TextAppearance.AppCompat.Medium"
+                        android:text="1"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                        android:text="time(s)"/>
+
+                </LinearLayout>
 
             </LinearLayout>
 

@@ -48,6 +48,7 @@
     <string name="starts_at">Starts at</string>
     <string name="ends_at">Ends at</string>
     <string-array name="pattern_options">
+        <item>Once</item>
         <item>Daily</item>
         <item>Weekly</item>
         <item>Monthly</item>
