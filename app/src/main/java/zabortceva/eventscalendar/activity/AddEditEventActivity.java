@@ -44,7 +44,9 @@ import zabortceva.eventscalendar.R;
 import zabortceva.eventscalendar.localdata.Event;
 import zabortceva.eventscalendar.localdata.Pattern;
 import zabortceva.eventscalendar.requests.ApiStrings;
+import zabortceva.eventscalendar.serverdata.Instance;
 import zabortceva.eventscalendar.view.DatePickerFragment;
+import zabortceva.eventscalendar.view.DateTimeString;
 import zabortceva.eventscalendar.view.TimePickerFragment;
 
 import static zabortceva.eventscalendar.activity.AddEditTaskActivity.EXTRA_TASK_DEADLINE_DAY;
@@ -53,12 +55,8 @@ import static zabortceva.eventscalendar.activity.AddEditTaskActivity.EXTRA_TASK_
 
 public class AddEditEventActivity extends AppCompatActivity {
     public static final String EXTRA_EVENT = "zabortceva.eventscalendar.EXTRA_EVENT";
-    public static final String EXTRA_EVENT_NAME = "zabortceva.eventscalendar.EXTRA_EVENT_NAME";
-    public static final String EXTRA_EVENT_DETAILS = "zabortceva.eventscalendar.EXTRA_EVENT_DETAILS";
-    public static final String EXTRA_EVENT_LOCATION = "zabortceva.eventscalendar.EXTRA_EVENT_LOCATION";
-    public static final String EXTRA_EVENT_STATUS = "zabortceva.eventscalendar.EXTRA_EVENT_STATUS";
-    public static final String EXTRA_EVENT_OWNER_ID = "zabortceva.eventscalendar.EXTRA_EVENT_OWNER_ID";
-    public static final String EXTRA_EVENT_ID = "zabortceva.eventscalendar.EXTRA_EVENT_ID";
+    public static final String EXTRA_PATTERN = "zabortceva.eventscalendar.EXTRA_PATTERN";
+    public static final String EXTRA_INSTANCE = "zabortceva.eventscalendar.EXTRA_INSTANCE";
 
     public static final String EXTRA_STARTS_AT = "zabortceva.eventscalendar.EXTRA_STARTS_AT";
 
@@ -68,7 +66,8 @@ public class AddEditEventActivity extends AppCompatActivity {
 
     public static final String EXTRA_MINUTE = "zabortceva.eventscalendar.EXTRA_MINUTE";
     public static final String EXTRA_HOUR = "zabortceva.eventscalendar.EXTRA_HOUR";
-    public static final String EXTRA_PATTERN = "zabortceva.eventscalendar.EXTRA_PATTERN";
+
+    public static final long INFINITE = Long.MAX_VALUE - 1;
 
     private FloatingActionButton saveEventButton;
     private EditText editEventName;
@@ -84,8 +83,6 @@ public class AddEditEventActivity extends AppCompatActivity {
     private Spinner patternSpinner;
 
     private Calendar c = Calendar.getInstance();
-    private DateFormat dfDay = new SimpleDateFormat("yyyy-MM-dd");
-    private DateFormat dfTime = new SimpleDateFormat("HH:mm");
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -105,16 +102,9 @@ public class AddEditEventActivity extends AppCompatActivity {
             }
         });
 
-        Intent intent = getIntent();
-        if (intent.hasExtra(EXTRA_EVENT_ID)) {
-            editEventName.setText(intent.getStringExtra(EXTRA_EVENT_NAME));
-            editEventDetails.setText(intent.getStringExtra(EXTRA_EVENT_DETAILS));
-            editEventLocation.setText(intent.getStringExtra(EXTRA_EVENT_LOCATION));
-            editEventStatus.setText(intent.getStringExtra(EXTRA_EVENT_STATUS));
-        }
-
         patternSpinner = findViewById(R.id.pattern_spinner);
         final ArrayList<String> patterns = new ArrayList<>();
+        patterns.add(ApiStrings.PATTERN_OPTIONS.ONCE);
         patterns.add(ApiStrings.PATTERN_OPTIONS.DAILY);
         patterns.add(ApiStrings.PATTERN_OPTIONS.WEEKLY);
         patterns.add(ApiStrings.PATTERN_OPTIONS.MONTHLY);
@@ -123,17 +113,19 @@ public class AddEditEventActivity extends AppCompatActivity {
         patternsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
         patternSpinner.setAdapter(patternsAdapter);
 
-        final Timestamp timestamp = new Timestamp(System.currentTimeMillis());//getIntent().getStringExtra(EXTRA_TASK_DEADLINE_AT);
-        String time = dfTime.format(timestamp);
-        String date = dfDay.format(timestamp);
-        try {
-            c.setTime(dfDay.parse(date));
-        } catch (ParseException p) {
-            p.printStackTrace();
+        Intent intent = getIntent();
+
+        long timeInMillis;
+        Instance instance = new Instance();
+        if (intent.hasExtra(EXTRA_STARTS_AT))
+            timeInMillis = getIntent().getLongExtra(EXTRA_STARTS_AT, 0);
+        else {
+            instance = (new Gson()).fromJson(intent.getStringExtra(EXTRA_INSTANCE), Instance.class);
+            timeInMillis = instance.getStarted_at();
         }
 
         startsAtDay = findViewById(R.id.starts_at_day);
-        startsAtDay.setText(date);
+        startsAtDay.setText(DateTimeString.getDateString(timeInMillis));
         startsAtDay.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -141,6 +133,7 @@ public class AddEditEventActivity extends AppCompatActivity {
                 DatePickerFragment datePicker = new DatePickerFragment();
 
                 Bundle args = new Bundle();
+                c.setTime(DateTimeString.getDate(startsAtDay.getText().toString()));
                 args.putInt(EXTRA_YEAR, c.get(Calendar.YEAR));
                 args.putInt(EXTRA_MONTH, c.get(Calendar.MONTH));
                 args.putInt(EXTRA_DAY, c.get(Calendar.DAY_OF_MONTH));
@@ -152,13 +145,14 @@ public class AddEditEventActivity extends AppCompatActivity {
         });
 
         startsAtTime = findViewById(R.id.starts_at_time);
-        startsAtTime.setText(time);
+        startsAtTime.setText(DateTimeString.getTimeString(timeInMillis));
         startsAtTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 TimePickerFragment timePicker = new TimePickerFragment();
 
                 Bundle args = new Bundle();
+                c.setTime(DateTimeString.getDate(startsAtTime.getText().toString()));
                 args.putInt(EXTRA_HOUR, c.get(Calendar.HOUR));
                 args.putInt(EXTRA_MINUTE, c.get(Calendar.MINUTE));
                 timePicker.setArguments(args);
@@ -168,11 +162,17 @@ public class AddEditEventActivity extends AppCompatActivity {
             }
         });
 
-        c.setTime(timestamp);
-        c.add(Calendar.HOUR_OF_DAY, 1);
+
+        if (intent.hasExtra(EXTRA_STARTS_AT)) {
+            c.setTime(new Date(timeInMillis));
+            c.add(Calendar.HOUR_OF_DAY, 1);
+            timeInMillis = c.getTimeInMillis();
+        } else {
+            timeInMillis = instance.getEnded_at();
+        }
 
         endsAtDay = findViewById(R.id.ends_at_day);
-        endsAtDay.setText(date);
+        endsAtDay.setText(DateTimeString.getDateString(timeInMillis));
         endsAtDay.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -180,6 +180,7 @@ public class AddEditEventActivity extends AppCompatActivity {
                 DatePickerFragment datePicker = new DatePickerFragment();
 
                 Bundle args = new Bundle();
+                c.setTime(DateTimeString.getDate(startsAtDay.getText().toString()));
                 args.putInt(EXTRA_YEAR, c.get(Calendar.YEAR));
                 args.putInt(EXTRA_MONTH, c.get(Calendar.MONTH));
                 args.putInt(EXTRA_DAY, c.get(Calendar.DAY_OF_MONTH));
@@ -191,13 +192,14 @@ public class AddEditEventActivity extends AppCompatActivity {
         });
 
         endsAtTime = findViewById(R.id.ends_at_time);
-        endsAtTime.setText(dfTime.format(c.getTime()));
+        endsAtTime.setText(DateTimeString.getTimeString(timeInMillis));
         endsAtTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 TimePickerFragment timePicker = new TimePickerFragment();
 
                 Bundle args = new Bundle();
+                c.setTime(DateTimeString.getDate(startsAtTime.getText().toString()));
                 args.putInt(EXTRA_HOUR, c.get(Calendar.HOUR));
                 args.putInt(EXTRA_MINUTE, c.get(Calendar.MINUTE));
                 timePicker.setArguments(args);
@@ -206,6 +208,28 @@ public class AddEditEventActivity extends AppCompatActivity {
                 timePicker.show(getSupportFragmentManager(), "Starts at time:");
             }
         });
+
+        if (intent.hasExtra(EXTRA_EVENT)) {
+            Event event = (new Gson()).fromJson(intent.getStringExtra(EXTRA_EVENT), Event.class);
+            editEventName.setText(event.getName());
+            editEventDetails.setText(event.getDetails());
+            editEventLocation.setText(event.getLocation());
+            editEventStatus.setText(event.getStatus());
+        }
+
+        if (intent.hasExtra(EXTRA_PATTERN)) {
+            Pattern pattern = (new Gson()).fromJson(intent.getStringExtra(EXTRA_PATTERN), Pattern.class);
+            RRule rule = null;
+            try {
+                rule = new RRule("RRULE:" + pattern.getRrule());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            String frequency = rule.getFreq().name();
+            int pattern_pos = patternsAdapter.getPosition(frequency);
+            patternSpinner.setSelection(pattern_pos);
+        }
+
     }
 
     DatePickerDialog.OnDateSetListener onEndsAtDay = new DatePickerDialog.OnDateSetListener() {
@@ -216,7 +240,7 @@ public class AddEditEventActivity extends AppCompatActivity {
             c.set(Calendar.MONTH, month);
             c.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-            String date = dfDay.format(c.getTime());
+            String date = DateTimeString.getDateString(c.getTimeInMillis());
 //            try {
 //                if ((dfDay.parse(c.getTime().toString())).compareTo(dfDay.parse(startsAtDay.getText().toString())) < 0) {
 //                    Toast.makeText(AddEditEventActivity.this, "Ends before start", Toast.LENGTH_SHORT).show();
@@ -237,7 +261,7 @@ public class AddEditEventActivity extends AppCompatActivity {
             c.set(Calendar.MONTH, month);
             c.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-            String date = dfDay.format(c.getTime());
+            String date = DateTimeString.getDateString(c.getTimeInMillis());
             startsAtDay.setText(date);
         }
     };
@@ -250,7 +274,7 @@ public class AddEditEventActivity extends AppCompatActivity {
             Timestamp timestamp = Timestamp.valueOf(time);
             timestamp.setHours(hourOfDay);
             timestamp.setMinutes(minute);
-            time = dfTime.format(timestamp);
+            time = DateTimeString.getTimeString(timestamp.getTime());
             startsAtTime.setText(time);
         }
     };
@@ -263,7 +287,7 @@ public class AddEditEventActivity extends AppCompatActivity {
             Timestamp timestamp = Timestamp.valueOf(time);
             timestamp.setHours(hourOfDay);
             timestamp.setMinutes(minute);
-            time = dfTime.format(timestamp);
+            time = DateTimeString.getTimeString(timestamp.getTime());
             endsAtTime.setText(time);
         }
     };

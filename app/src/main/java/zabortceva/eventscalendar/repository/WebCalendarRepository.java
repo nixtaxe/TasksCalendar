@@ -7,6 +7,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GetTokenResult;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -17,6 +18,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -37,6 +39,7 @@ import zabortceva.eventscalendar.requests.PatternsApi;
 import zabortceva.eventscalendar.requests.PermissionsApi;
 import zabortceva.eventscalendar.requests.TasksApi;
 import zabortceva.eventscalendar.serverdata.Events;
+import zabortceva.eventscalendar.serverdata.FullEvent;
 import zabortceva.eventscalendar.serverdata.Instance;
 import zabortceva.eventscalendar.serverdata.Instances;
 import zabortceva.eventscalendar.serverdata.Patterns;
@@ -224,6 +227,113 @@ public class WebCalendarRepository {
 
                     @Override
                     public void onFailure(Call<Events> call, Throwable t) {
+                        t.printStackTrace();
+                    }
+                });
+            }
+        });
+
+        return data;
+    }
+
+    public LiveData<List<FullEvent>> getDayFullEvents(final Timestamp timestamp) {
+        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        Date day = new Date();
+        try {
+            day = formatter.parse(formatter.format(timestamp));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        final Calendar calendar = Calendar.getInstance();
+        calendar.setTime(day);
+        final long startOfDay = calendar.getTimeInMillis();
+        calendar.add(Calendar.DAY_OF_YEAR, 1);
+        calendar.add(Calendar.SECOND, -1);
+        final long endOfDay = calendar.getTimeInMillis();
+
+        final MutableLiveData<List<FullEvent>> data = new MutableLiveData<>();
+
+        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+            @Override
+            public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
+                final String idToken = task.getResult().getToken();
+                eventsApi.getInstances(startOfDay, endOfDay, idToken).enqueue(new Callback<Instances>() {
+                    @Override
+                    public void onResponse(Call<Instances> call, Response<Instances> response) {
+                        if (response.body() != null) {
+                            List<Instance> list = Arrays.asList(response.body().getData());
+                            Collections.sort(list, new Comparator<Instance>() {
+                                @Override
+                                public int compare(Instance lhs, Instance rhs) {
+                                    // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+                                    return lhs.getStarted_at() < rhs.getStarted_at() ? -1 : (lhs.getStarted_at() > rhs.getStarted_at()) ? 1 :
+                                            (lhs.getEnded_at() < rhs.getEnded_at()) ? -1 : (lhs.getEnded_at() > rhs.getEnded_at()) ? 1 : 0;
+                                }
+                            });
+                            List<FullEvent> fullEvents = new ArrayList<>();
+                            for (Instance instance : list) {
+                                FullEvent fullEvent = new FullEvent();
+                                fullEvent.setInstance(instance);
+                                fullEvents.add(fullEvent);
+                            }
+                            final MutableLiveData<List<FullEvent>> buffer = new MutableLiveData<>();
+                            buffer.setValue(fullEvents);
+
+                            eventsApi.getEventsByInterval(startOfDay, endOfDay, idToken).enqueue(new Callback<Events>() {
+                                @Override
+                                public void onResponse(Call<Events> call, Response<Events> response) {
+                                    HashMap<Long, Event> eventHashMap = new HashMap<>();
+                                    List<Event> events = Arrays.asList(response.body().getData());
+                                    for (Event event : events) {
+                                        eventHashMap.put(event.getId(), event);
+                                    }
+                                    List<FullEvent> fullEvents = new ArrayList<>(buffer.getValue());
+                                    for (int i = 0; i < fullEvents.size(); ++i) {
+                                        FullEvent fullEvent = fullEvents.get(i);
+                                        fullEvent.setEvent(eventHashMap.get(fullEvent.getInstance().getEvent_id()));
+                                        fullEvents.set(i, fullEvent);
+                                    }
+                                    buffer.setValue(fullEvents);
+                                    patternsApi.getPatternByInterval(startOfDay, endOfDay, idToken).enqueue(new Callback<Patterns>() {
+                                        @Override
+                                        public void onResponse(Call<Patterns> call, Response<Patterns> response) {
+                                            HashMap<Long, Pattern> patternHashMap = new HashMap<>();
+                                            List<Pattern> patterns = Arrays.asList(response.body().getData());
+                                            for (Pattern pattern : patterns) {
+                                                patternHashMap.put(pattern.getId(), pattern);
+                                            }
+                                            List<FullEvent> fullEvents = new ArrayList<>(buffer.getValue());
+                                            for (int i = 0; i < fullEvents.size(); ++i) {
+                                                FullEvent fullEvent = fullEvents.get(i);
+                                                fullEvent.setPattern(patternHashMap.get(fullEvent.getInstance().getPattern_id()));
+                                                fullEvents.set(i, fullEvent);
+                                            }
+                                            data.setValue(fullEvents);
+                                        }
+
+                                        @Override
+                                        public void onFailure(Call<Patterns> call, Throwable t) {
+
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onFailure(Call<Events> call, Throwable t) {
+
+                                }
+                            });
+
+//                            data.setValue(fullEvents);
+                            Log.v("GetDayFullEvents", String.valueOf(response.code()));
+                        } else {
+                            Log.e("GetDayFullEvents", String.valueOf(response.code()));
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Instances> call, Throwable t) {
                         t.printStackTrace();
                     }
                 });

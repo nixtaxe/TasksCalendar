@@ -14,11 +14,12 @@ import java.util.List;
 import zabortceva.eventscalendar.localdata.Event;
 import zabortceva.eventscalendar.repository.WebCalendarRepository;
 import zabortceva.eventscalendar.serverdata.Events;
+import zabortceva.eventscalendar.serverdata.FullEvent;
 
 public class EventViewModel extends AndroidViewModel {
     private WebCalendarRepository repository;
     private LiveData<List<Event>> allEvents;
-    private LiveData<List<Event>> dayEvents;
+    private LiveData<List<FullEvent>> dayFullEvents;
     private LiveData<List<CalendarDay>> allBusyDays;
 
     public EventViewModel(@NonNull Application application) {
@@ -31,10 +32,10 @@ public class EventViewModel extends AndroidViewModel {
         allEvents = repository.getAllEvents();
         return allEvents;
     }
-    public LiveData<List<Event>> getSavedDayEvents() {return dayEvents;};
-    public LiveData<List<Event>> getDayEvents(Timestamp timestamp) {
-        dayEvents = repository.getDayEvents(timestamp);
-        return dayEvents;
+    public LiveData<List<FullEvent>> getSavedDayFullEvents() {return dayFullEvents;};
+    public LiveData<List<FullEvent>> getDayFullEvents(Timestamp timestamp) {
+        dayFullEvents = repository.getDayFullEvents(timestamp);
+        return dayFullEvents;
     }
     public LiveData<Events> insert(Event event) {
         return repository.insertEvent(event);

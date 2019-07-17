@@ -16,6 +16,10 @@ public interface PatternsApi {
     @GET(ApiStrings.PATTERNS_PATH)
     Call<Patterns> getAllPatterns(@Query(ApiStrings.COUNT) long count, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 
+    @GET(ApiStrings.PATTERNS_PATH)
+    Call<Patterns> getPatternByInterval(@Query(ApiStrings.FROM) long from, @Query(ApiStrings.TO) long to,
+                                        @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
+
     @POST(ApiStrings.PATTERNS_PATH)
     Call<Patterns> insertPattern(@Query(ApiStrings.EVENT_ID) Long event_id, @Body Pattern pattern,
                                  @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);

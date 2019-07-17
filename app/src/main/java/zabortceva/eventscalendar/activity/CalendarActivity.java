@@ -40,13 +40,16 @@ import zabortceva.eventscalendar.localdata.Pattern;
 import zabortceva.eventscalendar.localdata.Task;
 import zabortceva.eventscalendar.repository.WebCalendarRepository;
 import zabortceva.eventscalendar.serverdata.Events;
+import zabortceva.eventscalendar.serverdata.FullEvent;
 import zabortceva.eventscalendar.serverdata.Patterns;
 import zabortceva.eventscalendar.view.EventsAdapter;
+import zabortceva.eventscalendar.view.FullEventsAdapter;
 import zabortceva.eventscalendar.view.model.EventViewModel;
 import zabortceva.eventscalendar.view.TasksAdapter;
 import zabortceva.eventscalendar.view.model.PatternViewModel;
 
 import static zabortceva.eventscalendar.activity.AddEditEventActivity.EXTRA_EVENT;
+import static zabortceva.eventscalendar.activity.AddEditEventActivity.EXTRA_INSTANCE;
 import static zabortceva.eventscalendar.activity.AddEditEventActivity.EXTRA_PATTERN;
 
 public class CalendarActivity extends AppCompatActivity {
@@ -59,8 +62,8 @@ public class CalendarActivity extends AppCompatActivity {
     private RecyclerView eventsView;
     private FloatingActionButton addEventButton;
     private FloatingActionButton viewAccountButton;
-    final EventsAdapter eventsAdapter = new EventsAdapter();
-    private Observer<List<Event>> dayEventsObserver;
+    final FullEventsAdapter eventsAdapter = new FullEventsAdapter();
+    private Observer<List<FullEvent>> dayEventsObserver;
     private Observer<List<CalendarDay>> busyDaysObserver;
     private EventDecorator busyDaysDecorator = new EventDecorator(0, new ArrayList<CalendarDay>());
 
@@ -90,9 +93,9 @@ public class CalendarActivity extends AppCompatActivity {
         eventsView.setHasFixedSize(true);
         eventsView.setAdapter(eventsAdapter);
 
-        dayEventsObserver = new Observer<List<Event>>() {
+        dayEventsObserver = new Observer<List<FullEvent>>() {
             @Override
-            public void onChanged(List<Event> events) {
+            public void onChanged(List<FullEvent> events) {
                 eventsAdapter.submitList(events);
             }
         };
@@ -122,16 +125,20 @@ public class CalendarActivity extends AppCompatActivity {
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                eventViewModel.delete(eventsAdapter.getEventAt(viewHolder.getAdapterPosition()));
+                eventViewModel.delete(eventsAdapter.getEventAt(viewHolder.getAdapterPosition()).getEvent());
                 updateAllObservers();
                 Toast.makeText(CalendarActivity.this, R.string.task_was_deleted, Toast.LENGTH_SHORT).show();
             }
         }).attachToRecyclerView(eventsView);
 
-        eventsAdapter.setOnItemClickListener(new EventsAdapter.OnItemClickListener() {
+        eventsAdapter.setOnItemClickListener(new FullEventsAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(Event event) {
-                //TODO implement
+            public void onItemClick(FullEvent event) {
+                Intent intent = new Intent(CalendarActivity.this, AddEditEventActivity.class);
+                intent.putExtra(EXTRA_EVENT, (new Gson()).toJson(event.getEvent()));
+                intent.putExtra(EXTRA_PATTERN, (new Gson()).toJson(event.getPattern()));
+                intent.putExtra(EXTRA_INSTANCE, (new Gson()).toJson(event.getInstance()));
+                startActivityForResult(intent, EDIT_EVENT_REQUEST);
             }
         });
 
@@ -169,11 +176,11 @@ public class CalendarActivity extends AppCompatActivity {
     }
 
     private void observeNewDay(Timestamp timestamp) {
-        LiveData<List<Event>> dayEvents = eventViewModel.getSavedDayEvents();
+        LiveData<List<FullEvent>> dayEvents = eventViewModel.getSavedDayFullEvents();
         if (dayEvents != null && dayEvents.hasObservers())
             dayEvents.removeObserver(dayEventsObserver);
 
-        eventViewModel.getDayEvents(timestamp).observe(this, dayEventsObserver);
+        eventViewModel.getDayFullEvents(timestamp).observe(this, dayEventsObserver);
     }
 
     private void observeBusyDays() {

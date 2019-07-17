@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,12 +61,7 @@ public class EventsActivity extends AppCompatActivity {
             public void onItemClick(Event event) {
                 Intent intent = new Intent(EventsActivity.this, AddEditEventActivity.class);
 
-                intent.putExtra(AddEditEventActivity.EXTRA_EVENT_ID, event.getId());
-                intent.putExtra(AddEditEventActivity.EXTRA_EVENT_OWNER_ID, event.getOwner_id());
-                intent.putExtra(AddEditEventActivity.EXTRA_EVENT_NAME, event.getName());
-                intent.putExtra(AddEditEventActivity.EXTRA_EVENT_DETAILS, event.getDetails());
-                intent.putExtra(AddEditEventActivity.EXTRA_EVENT_LOCATION, event.getLocation());
-                intent.putExtra(AddEditEventActivity.EXTRA_EVENT_STATUS, event.getStatus());
+                intent.putExtra(AddEditEventActivity.EXTRA_EVENT, (new Gson()).toJson(event));
 
                 startActivityForResult(intent, EDIT_EVENT_REQUEST);
             }
@@ -121,49 +117,6 @@ public class EventsActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == ADD_EVENT_REQUEST && resultCode == RESULT_OK) {
-            String name = data.getStringExtra(AddEditEventActivity.EXTRA_EVENT_NAME);
-            String details = data.getStringExtra(AddEditEventActivity.EXTRA_EVENT_DETAILS);
-            String location = data.getStringExtra(AddEditEventActivity.EXTRA_EVENT_LOCATION);
-            String status = data.getStringExtra(AddEditEventActivity.EXTRA_EVENT_STATUS);
-
-            Event event = new Event(details, location, name, status);
-            eventViewModel.insert(event).observe(this, new Observer<Events>() {
-                @Override
-                public void onChanged(Events result) {
-                    if (result.isSuccess()) {
-                        Log.v("InsertEvent", "OK");
-                    }
-                    else
-                        Log.e("InsertEvent", result.getMessage());;
-                }
-            });
-
-        } else if (requestCode == EDIT_EVENT_REQUEST && resultCode == RESULT_OK) {
-            long id = data.getLongExtra(AddEditEventActivity.EXTRA_EVENT_ID, -1);
-            if (id == -1) {
-                Toast.makeText(this, R.string.task_can_not_be_updated, Toast.LENGTH_SHORT).show();
-                return;
-            }
-            String owner_id = data.getStringExtra(AddEditEventActivity.EXTRA_EVENT_OWNER_ID);
-            String name = data.getStringExtra(AddEditEventActivity.EXTRA_EVENT_NAME);
-            String details = data.getStringExtra(AddEditEventActivity.EXTRA_EVENT_DETAILS);
-            String location = data.getStringExtra(AddEditEventActivity.EXTRA_EVENT_LOCATION);
-            String status = data.getStringExtra(AddEditEventActivity.EXTRA_EVENT_STATUS);
-
-
-            Event event = new Event(details, location, name, status);
-            event.setId(id);
-            event.setOwner_id(owner_id);
-            eventViewModel.update(event);
-
-            Toast.makeText(this, R.string.task_was_updated, Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, R.string.changes_was_not_saved, Toast.LENGTH_SHORT).show();
-        }
-
-        updateEvents();
     }
 
     private TextView selectedDate;
