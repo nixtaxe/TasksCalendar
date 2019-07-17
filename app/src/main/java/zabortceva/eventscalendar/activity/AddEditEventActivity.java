@@ -60,6 +60,8 @@ public class AddEditEventActivity extends AppCompatActivity {
     public static final String EXTRA_EVENT_OWNER_ID = "zabortceva.eventscalendar.EXTRA_EVENT_OWNER_ID";
     public static final String EXTRA_EVENT_ID = "zabortceva.eventscalendar.EXTRA_EVENT_ID";
 
+    public static final String EXTRA_STARTS_AT = "zabortceva.eventscalendar.EXTRA_STARTS_AT";
+
     public static final String EXTRA_DAY = "zabortceva.eventscalendar.EXTRA_DAY";
     public static final String EXTRA_MONTH = "zabortceva.eventscalendar.EXTRA_MONTH";
     public static final String EXTRA_YEAR = "zabortceva.eventscalendar.EXTRA_YEAR";

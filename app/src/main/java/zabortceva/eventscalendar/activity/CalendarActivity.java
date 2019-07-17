@@ -41,8 +41,8 @@ import zabortceva.eventscalendar.localdata.Task;
 import zabortceva.eventscalendar.repository.WebCalendarRepository;
 import zabortceva.eventscalendar.serverdata.Events;
 import zabortceva.eventscalendar.serverdata.Patterns;
+import zabortceva.eventscalendar.view.EventsAdapter;
 import zabortceva.eventscalendar.view.model.EventViewModel;
-import zabortceva.eventscalendar.view.model.TaskViewModel;
 import zabortceva.eventscalendar.view.TasksAdapter;
 
 import static zabortceva.eventscalendar.activity.AddEditEventActivity.EXTRA_EVENT;
@@ -51,29 +51,25 @@ import static zabortceva.eventscalendar.activity.AddEditEventActivity.EXTRA_PATT
 public class CalendarActivity extends AppCompatActivity {
 
     public static final int ADD_EVENT_REQUEST = 1;
-    public static final int EDIT_TASK_REQUEST = 2;
-
-    //TODO adjust insertion into table
-
-    //TODO figure out how to implement events and users
+    public static final int EDIT_EVENT_REQUEST = 2;
+    
     private ArrayList<String> events;
     private MaterialCalendarView calendarView;
-    private RecyclerView tasksView;
-    private FloatingActionButton addTaskButton;
-    private FloatingActionButton viewEventsButton;
+    private RecyclerView eventsView;
+    private FloatingActionButton addEventButton;
     private FloatingActionButton viewAccountButton;
-    final TasksAdapter tasksAdapter = new TasksAdapter();
-    private Observer<List<Task>> dayTasksObserver;
+    final EventsAdapter eventsAdapter = new EventsAdapter();
+    private Observer<List<Event>> dayEventsObserver;
     private Observer<List<CalendarDay>> busyDaysObserver;
     private EventDecorator busyDaysDecorator = new EventDecorator(0, new ArrayList<CalendarDay>());
 
-    private TaskViewModel taskViewModel;
     private EventViewModel eventViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.calendar_layout);
+        eventViewModel = ViewModelProviders.of(this).get(EventViewModel.class);
 
         viewAccountButton = findViewById(R.id.view_account_button);
         viewAccountButton.setOnClickListener(new View.OnClickListener() {
@@ -85,18 +81,16 @@ public class CalendarActivity extends AppCompatActivity {
         if (FirebaseAuth.getInstance().getCurrentUser() == null)
             viewAccountButton.performClick();
 
-        tasksView = findViewById(R.id.tasksView);
+        eventsView = findViewById(R.id.list_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        tasksView.setLayoutManager(layoutManager);
-        tasksView.setHasFixedSize(true);
-        tasksView.setAdapter(tasksAdapter);
+        eventsView.setLayoutManager(layoutManager);
+        eventsView.setHasFixedSize(true);
+        eventsView.setAdapter(eventsAdapter);
 
-        taskViewModel = ViewModelProviders.of(this).get(TaskViewModel.class);
-
-        dayTasksObserver = new Observer<List<Task>>() {
+        dayEventsObserver = new Observer<List<Event>>() {
             @Override
-            public void onChanged(List<Task> tasks) {
-                tasksAdapter.submitList(tasks);
+            public void onChanged(List<Event> events) {
+                eventsAdapter.submitList(events);
             }
         };
         observeNewDay(new Timestamp(System.currentTimeMillis()));
@@ -113,7 +107,7 @@ public class CalendarActivity extends AppCompatActivity {
                 calendarView.addDecorator(busyDaysDecorator);
             }
         };
-        taskViewModel.getAllBusyDays().observe(this, busyDaysObserver);
+        eventViewModel.getAllBusyDays().observe(this, busyDaysObserver);
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -125,30 +119,20 @@ public class CalendarActivity extends AppCompatActivity {
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                taskViewModel.delete(tasksAdapter.getTaskAt(viewHolder.getAdapterPosition()));
+                eventViewModel.delete(eventsAdapter.getEventAt(viewHolder.getAdapterPosition()));
                 updateAllObservers();
                 Toast.makeText(CalendarActivity.this, R.string.task_was_deleted, Toast.LENGTH_SHORT).show();
             }
-        }).attachToRecyclerView(tasksView);
+        }).attachToRecyclerView(eventsView);
 
-        tasksAdapter.setOnItemClickListener(new TasksAdapter.OnItemClickListener() {
+        eventsAdapter.setOnItemClickListener(new EventsAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(Task task) {
-                Intent intent = new Intent(CalendarActivity.this, AddEditTaskActivity.class);
-
-                intent.putExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME, task.getEvent_id());
-                intent.putExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME, task.getEvent_id());
-                intent.putExtra(AddEditTaskActivity.EXTRA_TASK_ID, task.getId());
-                intent.putExtra(AddEditTaskActivity.EXTRA_TASK_NAME, task.getName());
-                intent.putExtra(AddEditTaskActivity.EXTRA_TASK_DETAILS, task.getDetails());
-                intent.putExtra(AddEditTaskActivity.EXTRA_TASK_DEADLINE_AT, new Timestamp(task.getDeadline_at()).toString());
-                intent.putExtra(AddEditTaskActivity.EXTRA_TASK_DEADLINE_AT, new Timestamp(task.getDeadline_at()).toString());
-
-                startActivityForResult(intent, EDIT_TASK_REQUEST);
+            public void onItemClick(Event event) {
+                //TODO implement
             }
         });
 
-        calendarView = findViewById(R.id.calendarView);
+        calendarView = findViewById(R.id.calendar_view);
         calendarView.addDecorator(busyDaysDecorator);
         calendarView.setTileHeightDp(40);
         calendarView.setTileWidthDp(60);
@@ -162,87 +146,39 @@ public class CalendarActivity extends AppCompatActivity {
         });
         calendarView.setSelectedDate(new Date(System.currentTimeMillis()));
 
-        addTaskButton = findViewById(R.id.add_task_button);
-        addTaskButton.setOnClickListener(new View.OnClickListener() {
+        addEventButton = findViewById(R.id.add_button);
+        addEventButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(CalendarActivity.this, AddEditEventActivity.class);
-//                Timestamp dateTime = new Timestamp(calendarView.getSelectedDate().getDate().getTime());
-//                intent.putExtra(AddEditTaskActivity.EXTRA_TASK_DEADLINE_AT, dateTime.toString());
-//                intent.putStringArrayListExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME, events);
+                Timestamp dateTime = new Timestamp(calendarView.getSelectedDate().getDate().getTime());
+                intent.putExtra(AddEditEventActivity.EXTRA_STARTS_AT, dateTime.getTime());
+                
                 startActivityForResult(intent, ADD_EVENT_REQUEST);
             }
         });
-
-        eventViewModel = ViewModelProviders.of(this).get(EventViewModel.class);
-//        events = new ArrayList<>();
-//        eventViewModel.getAllEvents().observe(this, new Observer<List<Event>>() {
-//            @Override
-//            public void onChanged(List<Event> new_events) {
-//                events.clear();
-//                for (Event event : new_events) {
-//                    events.add(event.getName());
-//                }
-//            }
-//        });
-
-        viewEventsButton = findViewById(R.id.view_events_button);
-        viewEventsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(CalendarActivity.this, EventsActivity.class);
-                intent.putStringArrayListExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME, events);
-
-                startActivity(intent);
-            }
-        });
-
-//        Notifications
-//        taskViewModel.getAllTasks().observe(this, new Observer<List<Task>>() {
-//            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-//            @Override
-//            public void onChanged(List<Task> tasks) {
-//                Task task = tasks.get(tasks.size() - 1);
-//                Calendar c = Calendar.getInstance();
-//                c.set(Calendar.HOUR, task.getDeadline_at().getHours());
-//                c.set(Calendar.MINUTE, task.getDeadline_at().getMinutes());
-//                c.set(Calendar.SECOND, 0);
-//
-//                if (c.before(Calendar.getInstance())) {
-//                    return;
-//                }
-//
-//                AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-//                Intent intent = new Intent(CalendarActivity.this, AlertReceiver.class);
-//                intent.putExtra(AddEditTaskActivity.EXTRA_TASK_NAME, task.getName());
-//                intent.putExtra(AddEditTaskActivity.EXTRA_TASK_DETAILS, task.getDetails());
-//                PendingIntent pendingIntent = PendingIntent.getBroadcast(CalendarActivity.this, 1, intent, 0);
-//
-//                alarmManager.setExact(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), pendingIntent);
-//            }
-//        });
     }
 
     private void updateAllObservers() {
-        observeNewDay(taskViewModel.getSelectedDay());
+        observeNewDay(new Timestamp(calendarView.getSelectedDate().getDate().getTime()));
         observeBusyDays();
     }
 
     private void observeNewDay(Timestamp timestamp) {
-        LiveData<List<Task>> dayTasks = taskViewModel.getSavedDayTasks();
-        if (dayTasks != null && dayTasks.hasObservers())
-            dayTasks.removeObserver(dayTasksObserver);
+        LiveData<List<Event>> dayEvents = eventViewModel.getSavedDayEvents();
+        if (dayEvents != null && dayEvents.hasObservers())
+            dayEvents.removeObserver(dayEventsObserver);
 
-        taskViewModel.getDayTasks(timestamp).observe(this, dayTasksObserver);
+        eventViewModel.getDayEvents(timestamp).observe(this, dayEventsObserver);
     }
 
     private void observeBusyDays() {
-        LiveData<List<CalendarDay>> allBusyDays = taskViewModel.getSavedAllBusyDays();
+        LiveData<List<CalendarDay>> allBusyDays = eventViewModel.getSavedAllBusyDays();
         if (allBusyDays != null && allBusyDays.hasObservers())
             allBusyDays.removeObserver(busyDaysObserver);
 
-        taskViewModel.getAllBusyDays().observe(this, busyDaysObserver);
+        eventViewModel.getAllBusyDays().observe(this, busyDaysObserver);
     }
 
     Observer<Events> responseObserver = new Observer<Events>() {
@@ -280,21 +216,10 @@ public class CalendarActivity extends AppCompatActivity {
                 }
             });
 
-        } else if (requestCode == EDIT_TASK_REQUEST && resultCode == RESULT_OK) {
-            long id = data.getLongExtra(AddEditTaskActivity.EXTRA_TASK_ID, -1);
-            if (id == -1) {
-                Toast.makeText(this, R.string.task_can_not_be_updated, Toast.LENGTH_SHORT).show();
-                return;
-            }
-            String name = data.getStringExtra(AddEditTaskActivity.EXTRA_TASK_NAME);
-            String details = data.getStringExtra(AddEditTaskActivity.EXTRA_TASK_DETAILS);
-            Timestamp deadline_at = Timestamp.valueOf(data.getStringExtra(AddEditTaskActivity.EXTRA_TASK_DEADLINE_AT));
-            long event_id = data.getLongExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME, -1);
-
-            Task task = new Task(name, details, deadline_at);
-            task.setId(id);
-            task.setEvent_id(event_id);
-            taskViewModel.update(task);
+        } else if (requestCode == EDIT_EVENT_REQUEST && resultCode == RESULT_OK) {
+            final Event event = (new Gson()).fromJson(data.getStringExtra(EXTRA_EVENT), Event.class);
+            final Pattern pattern = (new Gson()).fromJson(data.getStringExtra(EXTRA_PATTERN), Pattern.class);
+            eventViewModel.update(event);
 
             updateAllObservers();
 

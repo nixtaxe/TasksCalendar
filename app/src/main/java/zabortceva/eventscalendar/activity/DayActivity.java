@@ -20,7 +20,7 @@ public class DayActivity extends AppCompatActivity {
     private TextView date;
     private Button btnGoToCalendar;
     private RecyclerView tasksView;
-//    private TasksAdapter tasksAdapter;
+//    private TasksAdapter eventsAdapter;
     private Button btnAddTask;
 
     public List<String> tasks;
@@ -38,8 +38,8 @@ public class DayActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         tasksView.setLayoutManager(layoutManager);
 
-//        tasksAdapter = new TasksAdapter(this);
-//        tasksView.setAdapter(tasksAdapter);
+//        eventsAdapter = new TasksAdapter(this);
+//        tasksView.setAdapter(eventsAdapter);
 
         Intent incomingIntent = getIntent();
         String sDate = incomingIntent.getStringExtra("date");
@@ -57,7 +57,7 @@ public class DayActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 tasks.add(String.valueOf(1));
-//                tasksAdapter.notifyDataSetChanged();
+//                eventsAdapter.notifyDataSetChanged();
             }
         });
     }

@@ -27,6 +27,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import scala.util.parsing.combinator.testing.Str;
 import zabortceva.eventscalendar.localdata.Event;
 import zabortceva.eventscalendar.localdata.Pattern;
 import zabortceva.eventscalendar.localdata.Permission;
@@ -36,6 +37,8 @@ import zabortceva.eventscalendar.requests.PatternsApi;
 import zabortceva.eventscalendar.requests.PermissionsApi;
 import zabortceva.eventscalendar.requests.TasksApi;
 import zabortceva.eventscalendar.serverdata.Events;
+import zabortceva.eventscalendar.serverdata.Instance;
+import zabortceva.eventscalendar.serverdata.Instances;
 import zabortceva.eventscalendar.serverdata.Patterns;
 import zabortceva.eventscalendar.serverdata.Permissions;
 import zabortceva.eventscalendar.serverdata.ServerDatabase;
@@ -180,6 +183,58 @@ public class WebCalendarRepository {
         return data;
     }
 
+    public LiveData<List<Event>> getDayEvents(final Timestamp timestamp) {
+        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        Date day = new Date();
+        try {
+            day = formatter.parse(formatter.format(timestamp));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        final Calendar calendar = Calendar.getInstance();
+        calendar.setTime(day);
+        final long startOfDay = calendar.getTimeInMillis();
+        calendar.add(Calendar.DAY_OF_YEAR, 1);
+        calendar.add(Calendar.SECOND, -1);
+        final long endOfDay = calendar.getTimeInMillis();
+
+        final MutableLiveData<List<Event>> data = new MutableLiveData<>();
+
+        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+            @Override
+            public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
+                String idToken = task.getResult().getToken();
+                eventsApi.getEventsByInterval(startOfDay, endOfDay, idToken).enqueue(new Callback<Events>() {
+                    @Override
+                    public void onResponse(Call<Events> call, Response<Events> response) {
+                        if (response.body() != null) {
+                            List<Event> list = Arrays.asList(response.body().getData());
+                            Collections.sort(list, new Comparator<Event>() {
+                                @Override
+                                public int compare(Event lhs, Event rhs) {
+                                    // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+                                    return lhs.getCreated_at() < rhs.getCreated_at() ? -1 : (lhs.getCreated_at() > rhs.getCreated_at()) ? 1 : 0;
+                                }
+                            });
+                            data.setValue(list);
+                            Log.v("GetAllEvents", String.valueOf(response.code()));
+                        } else {
+                            Log.e("GetAllEvents", String.valueOf(response.code()));
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Events> call, Throwable t) {
+                        t.printStackTrace();
+                    }
+                });
+            }
+        });
+
+        return data;
+    }
+
     public LiveData<List<Task>> getDayTasks(Timestamp timestamp) {
         DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         Date day = new Date();
@@ -272,13 +327,13 @@ public class WebCalendarRepository {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
                 String idToken = task.getResult().getToken();
-                tasksApi.getAllTasks(1000, idToken).enqueue(new Callback<Tasks>() {
+                eventsApi.getAllInstances(100, idToken).enqueue(new Callback<Instances>() {
                     @Override
-                    public void onResponse(Call<Tasks> call, Response<Tasks> response) {
+                    public void onResponse(Call<Instances> call, Response<Instances> response) {
                         if (response.body() != null) {
                             List<CalendarDay> days = new ArrayList<>();
-                            for (Task task : response.body().getData()) {
-                                days.add(new CalendarDay(new Date(task.getDeadline_at())));
+                            for (Instance instance : response.body().getData()) {
+                                days.add(new CalendarDay(new Date(instance.getStarted_at())));
                             }
                             data.setValue(days);
                             Log.v("GetBusyDays", String.valueOf(response.code()));
@@ -288,7 +343,7 @@ public class WebCalendarRepository {
                     }
 
                     @Override
-                    public void onFailure(Call<Tasks> call, Throwable t) {
+                    public void onFailure(Call<Instances> call, Throwable t) {
                         //
                     }
                 });
@@ -485,6 +540,30 @@ public class WebCalendarRepository {
         });
     }
 
+    public LiveData<Pattern> getPatternById(final long id) {
+        final MutableLiveData<Pattern> data = new MutableLiveData<>();
+
+        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+            @Override
+            public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
+                String idToken = task.getResult().getToken();
+                patternsApi.getPatternById(id, idToken).enqueue(new Callback<Patterns>() {
+                    @Override
+                    public void onResponse(Call<Patterns> call, Response<Patterns> response) {
+                        data.setValue(response.body().getData()[0]);
+                    }
+
+                    @Override
+                    public void onFailure(Call<Patterns> call, Throwable t) {
+
+                    }
+                });
+            }
+        });
+
+        return data;
+    }
+
     public LiveData<Patterns> insertPattern(final long event_id, final Pattern pattern) {
         final MutableLiveData<Patterns> data = new MutableLiveData<>();
 
@@ -493,6 +572,54 @@ public class WebCalendarRepository {
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
                 String idToken = task.getResult().getToken();
                 patternsApi.insertPattern(event_id, pattern, idToken).enqueue(new Callback<Patterns>() {
+                    @Override
+                    public void onResponse(Call<Patterns> call, Response<Patterns> response) {
+                        data.setValue(response.body());
+                    }
+
+                    @Override
+                    public void onFailure(Call<Patterns> call, Throwable t) {
+
+                    }
+                });
+            }
+        });
+
+        return data;
+    }
+
+    public LiveData<Patterns> updatePattern(final Pattern pattern) {
+        final MutableLiveData<Patterns> data = new MutableLiveData<>();
+
+        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+            @Override
+            public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
+                String idToken = task.getResult().getToken();
+                patternsApi.updatePattern(pattern.getId(), pattern, idToken).enqueue(new Callback<Patterns>() {
+                    @Override
+                    public void onResponse(Call<Patterns> call, Response<Patterns> response) {
+                        data.setValue(response.body());
+                    }
+
+                    @Override
+                    public void onFailure(Call<Patterns> call, Throwable t) {
+
+                    }
+                });
+            }
+        });
+
+        return data;
+    }
+
+    public LiveData<Patterns> deletePattern(final long id) {
+        final MutableLiveData<Patterns> data = new MutableLiveData<>();
+
+        FirebaseAuth.getInstance().getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+            @Override
+            public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
+                String idToken = task.getResult().getToken();
+                patternsApi.deletePattern(id, idToken).enqueue(new Callback<Patterns>() {
                     @Override
                     public void onResponse(Call<Patterns> call, Response<Patterns> response) {
                         data.setValue(response.body());

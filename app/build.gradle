@@ -11,8 +11,9 @@ android {
             }
         }
         applicationId "zabortceva.eventscalendar"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 28
+        multiDexEnabled true
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -88,6 +89,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.dmfs/lib-recur
     implementation group: 'org.dmfs', name: 'lib-recur', version: '0.10.2'
+
+    //multidex
+    implementation 'androidx.multidex:multidex:2.0.1'
 }
 
 apply plugin: 'com.google.gms.google-services'

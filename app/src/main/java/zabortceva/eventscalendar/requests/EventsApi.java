@@ -51,4 +51,10 @@ public interface EventsApi {
     })
     @GET(ApiStrings.INSTANCES_PATH)
     Call<Instances> getInstances(@Query(ApiStrings.FROM) long from, @Query(ApiStrings.TO) long to);
+
+    @Headers({
+            ApiStrings.ACCEPT_JSON
+    })
+    @GET(ApiStrings.INSTANCES_PATH)
+    Call<Instances> getAllInstances(@Query(ApiStrings.COUNT) int count, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 }

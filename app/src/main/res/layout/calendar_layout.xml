@@ -8,17 +8,17 @@
     >
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/tasksView"
+        android:id="@+id/list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:listitem="@layout/task_item"
-        android:layout_above="@id/calendarView"/>
+        tools:listitem="@layout/event_item"
+        android:layout_above="@+id/calendar_view"/>
 
     <com.prolificinteractive.materialcalendarview.MaterialCalendarView
-        android:id="@+id/calendarView"
+        android:id="@+id/calendar_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/add_task_button"/>
+        android:layout_above="@id/add_button"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/view_account_button"
@@ -26,25 +26,17 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_account"
         android:layout_alignParentBottom="true"
-        android:layout_toStartOf="@+id/view_events_button"
+        android:layout_toStartOf="@+id/add_button"
         android:layout_margin="8dp"/>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/view_events_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_events"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="8dp"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/add_task_button"
+        android:id="@+id/add_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_add"
         android:layout_alignParentBottom="true"
-        android:layout_toEndOf="@+id/view_events_button"
+        android:layout_alignParentEnd="true"
         android:layout_margin="8dp"/>
 
 
