@@ -1,5 +1,7 @@
 package zabortceva.eventscalendar.requests;
 
+import android.widget.ToggleButton;
+
 public interface ApiStrings {
     //Most valuable string constant ever
     public static final String X_FIREBASE_AUTH = "X-Firebase-Auth";
@@ -43,13 +45,25 @@ public interface ApiStrings {
     public static final String PERMISSIONS = "permissions";
     public static final String EMAIL = "email";
 
+    public static final String[] FREQUENCIES = {"ONCE", "DAILY", "WEEKLY", "MONTHLY", "YEARLY"};
     public static final String PATTERN = "pattern";
     public interface PATTERN_OPTIONS {
-        public static final String ONCE = "Once";
-        public static final String DAILY = "Daily";
-        public static final String WEEKLY = "Weekly";
-        public static final String MONTHLY = "Monthly";
-        public static final String YEARLY = "Yearly";
+        public static final String ONCE = "ONCE";
+        public static final String DAILY = "DAILY";
+        public static final String WEEKLY = "WEEKLY";
+        public static final String MONTHLY = "MONTHLY";
+        public static final String YEARLY = "YEARLY";
+    }
+
+    public static final String[] WEEKDAYS = {"MO", "TU", "WE", "TH", "FR", "SA", "SU"};
+    public interface WEEKDAY_OPTIONS {
+        public static final String MONDAY = "MO";
+        public static final String TUESDAY = "TU";
+        public static final String WEDNESDAY = "WE";
+        public static final String THURSDAY = "TH";
+        public static final String FRIDAY = "FR";
+        public static final String SATURDAY = "SA";
+        public static final String SUNDAY = "SU";
     }
 
     public static final String ENTITY_TYPE = "entity_type";
@@ -65,4 +79,6 @@ public interface ApiStrings {
         public static final String UPDATE = "UPDATE";
         public static final String DELETE = "DELETE";
     }
+
+
 }

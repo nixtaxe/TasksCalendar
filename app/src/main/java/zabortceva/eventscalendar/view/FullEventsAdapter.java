@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
+import java.util.Objects;
 
 import zabortceva.eventscalendar.R;
 import zabortceva.eventscalendar.localdata.Event;
@@ -28,7 +29,7 @@ public class FullEventsAdapter extends ListAdapter<FullEvent, FullEventsAdapter.
     private static final DiffUtil.ItemCallback<FullEvent> DIFF_CALLBACK = new DiffUtil.ItemCallback<FullEvent>() {
         @Override
         public boolean areItemsTheSame(@NonNull FullEvent event, @NonNull FullEvent t1) {
-            return true;
+            return false;
         }
 
         @Override
@@ -80,9 +81,13 @@ public class FullEventsAdapter extends ListAdapter<FullEvent, FullEventsAdapter.
         private void bind(FullEvent fullEvent) {
             Event event = fullEvent.getEvent();
             if (event != null) {
-                listItemNameView.setText(String.valueOf(event.getName()));
-                listItemDetailsView.setText(event.getDetails());
-                listItemLocationView.setText(event.getLocation());
+                listItemNameView.setText("Event: " + String.valueOf(event.getName()));
+                listItemDetailsView.setText("Details: " + event.getDetails());
+                if (Objects.equals(event.getDetails().trim(), ""))
+                    listItemDetailsView.setVisibility(View.GONE);
+                listItemLocationView.setText("Location: " + event.getLocation());
+                if(Objects.equals(event.getLocation().trim(), ""))
+                    listItemLocationView.setVisibility(View.GONE);
             }
 
             Instance instance = fullEvent.getInstance();

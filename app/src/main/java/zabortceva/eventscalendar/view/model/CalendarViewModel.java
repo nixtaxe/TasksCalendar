@@ -1,4 +1,4 @@
-package zabortceva.eventscalendar.view;
+package zabortceva.eventscalendar.view.model;
 
 import androidx.lifecycle.ViewModel;
 

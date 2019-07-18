@@ -4,8 +4,8 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -13,34 +13,30 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
-import com.google.ical.iter.RecurrenceIterator;
-import com.google.ical.values.DateTimeValue;
-import com.google.ical.values.DateValue;
 import com.google.ical.values.Frequency;
 import com.google.ical.values.RRule;
 import com.google.ical.values.Weekday;
 
-import org.dmfs.rfc5545.DateTime;
-import org.dmfs.rfc5545.recur.InvalidRecurrenceRuleException;
-import org.dmfs.rfc5545.recur.RecurrenceRule;
-import org.dmfs.rfc5545.recur.RecurrenceRuleIterator;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDateTime;
 
-import java.sql.Time;
 import java.sql.Timestamp;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
 
@@ -52,12 +48,14 @@ import zabortceva.eventscalendar.serverdata.Instance;
 import zabortceva.eventscalendar.view.DatePickerFragment;
 import zabortceva.eventscalendar.view.DateTimeString;
 import zabortceva.eventscalendar.view.TimePickerFragment;
-
-import static zabortceva.eventscalendar.activity.AddEditTaskActivity.EXTRA_TASK_DEADLINE_DAY;
-import static zabortceva.eventscalendar.activity.AddEditTaskActivity.EXTRA_TASK_DEADLINE_MONTH;
-import static zabortceva.eventscalendar.activity.AddEditTaskActivity.EXTRA_TASK_DEADLINE_YEAR;
+import zabortceva.eventscalendar.view.UpdateUi;
 
 public class AddEditEventActivity extends AppCompatActivity {
+    public static final Integer[] WEEKDAY_BUTTONS_IDS = {R.id.monday, R.id.tuesday, R.id.wednesday,
+            R.id.thursday, R.id.friday, R.id.saturday, R.id.sunday};
+    public static final Frequency[] FREQUENCIES = {null, Frequency.DAILY, Frequency.WEEKLY,
+            Frequency.MONTHLY, Frequency.YEARLY};
+
     public static final String EXTRA_EVENT = "zabortceva.eventscalendar.EXTRA_EVENT";
     public static final String EXTRA_PATTERN = "zabortceva.eventscalendar.EXTRA_PATTERN";
     public static final String EXTRA_INSTANCE = "zabortceva.eventscalendar.EXTRA_INSTANCE";
@@ -88,11 +86,61 @@ public class AddEditEventActivity extends AppCompatActivity {
     private Spinner timezoneSpinner;
 
     private Calendar c = Calendar.getInstance();
+    private HashMap<ToggleButton, String> weekdayHashMap;
+    private HashMap<String, Frequency> frequencyHashMap;
+    private HashMap<String, UpdateUi> updateUiMap;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_event);
+
+        weekdayHashMap = new HashMap<>();
+        for (int i = 0; i < WEEKDAY_BUTTONS_IDS.length; i++) {
+            weekdayHashMap.put((ToggleButton) findViewById(WEEKDAY_BUTTONS_IDS[i]), ApiStrings.WEEKDAYS[i]);
+        }
+
+        frequencyHashMap = new HashMap<>();
+        for (int i = 0; i < FREQUENCIES.length; i++) {
+            frequencyHashMap.put(ApiStrings.FREQUENCIES[i], FREQUENCIES[i]);
+        }
+
+        updateUiMap = new HashMap<>();
+        updateUiMap.put(ApiStrings.PATTERN_OPTIONS.ONCE, new UpdateUi() {
+            @Override
+            public void updateUi() {
+                findViewById(R.id.weekdays).setVisibility(View.GONE);
+                findViewById(R.id.freq_and_count).setVisibility(View.GONE);
+            }
+        });
+        updateUiMap.put(ApiStrings.PATTERN_OPTIONS.DAILY, new UpdateUi() {
+            @Override
+            public void updateUi() {
+                findViewById(R.id.freq_and_count).setVisibility(View.VISIBLE);
+                findViewById(R.id.weekdays).setVisibility(View.GONE);
+            }
+        });
+        updateUiMap.put(ApiStrings.PATTERN_OPTIONS.WEEKLY, new UpdateUi() {
+            @Override
+            public void updateUi() {
+                findViewById(R.id.weekdays).setVisibility(View.VISIBLE);
+                findViewById(R.id.freq_and_count).setVisibility(View.VISIBLE);
+            }
+        });
+        updateUiMap.put(ApiStrings.PATTERN_OPTIONS.MONTHLY, new UpdateUi() {
+            @Override
+            public void updateUi() {
+                findViewById(R.id.weekdays).setVisibility(View.GONE);
+                findViewById(R.id.freq_and_count).setVisibility(View.VISIBLE);
+            }
+        });
+        updateUiMap.put(ApiStrings.PATTERN_OPTIONS.YEARLY, new UpdateUi() {
+            @Override
+            public void updateUi() {
+                findViewById(R.id.weekdays).setVisibility(View.GONE);
+                findViewById(R.id.freq_and_count).setVisibility(View.VISIBLE);
+            }
+        });
 
         editEventName = findViewById(R.id.edit_event_name);
         editEventDetails = findViewById(R.id.edit_event_details);
@@ -117,6 +165,7 @@ public class AddEditEventActivity extends AppCompatActivity {
         ArrayAdapter<String> patternsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, patterns);
         patternsAdapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
         patternSpinner.setAdapter(patternsAdapter);
+        patternSpinner.setOnItemSelectedListener(onPatternSelected);
 
         Intent intent = getIntent();
 
@@ -127,6 +176,14 @@ public class AddEditEventActivity extends AppCompatActivity {
         else {
             instance = (new Gson()).fromJson(intent.getStringExtra(EXTRA_INSTANCE), Instance.class);
             timeInMillis = instance.getStarted_at();
+        }
+
+        if (intent.hasExtra(EXTRA_PATTERN)) {
+            Pattern pattern = (new Gson()).fromJson(intent.getStringExtra(EXTRA_PATTERN), Pattern.class);
+            TimeZone timeZone = TimeZone.getTimeZone(pattern.getTimezone());
+            LocalDateTime time = LocalDateTime.fromDateFields(new Date(timeInMillis));
+            DateTime zonedDateTime = time.toDateTime(DateTimeZone.forTimeZone(timeZone));
+            timeInMillis = zonedDateTime.getMillis();
         }
 
         startsAtDay = findViewById(R.id.starts_at_day);
@@ -174,6 +231,11 @@ public class AddEditEventActivity extends AppCompatActivity {
             timeInMillis = c.getTimeInMillis();
         } else {
             timeInMillis = instance.getEnded_at();
+            Pattern pattern = (new Gson()).fromJson(intent.getStringExtra(EXTRA_PATTERN), Pattern.class);
+            TimeZone timeZone = TimeZone.getTimeZone(pattern.getTimezone());
+            LocalDateTime time = LocalDateTime.fromDateFields(new Date(timeInMillis));
+            DateTime zonedDateTime = time.toDateTime(DateTimeZone.forTimeZone(timeZone));
+            timeInMillis = zonedDateTime.getMillis();
         }
 
         endsAtDay = findViewById(R.id.ends_at_day);
@@ -247,12 +309,16 @@ public class AddEditEventActivity extends AppCompatActivity {
                 RRule rule = null;
                 try {
                     rule = new RRule("RRULE:" + pattern.getRrule());
+                    String frequency = rule.getFreq().name();
+                    int pattern_pos = patternsAdapter.getPosition(frequency);
+                    patternSpinner.setSelection(pattern_pos);
                 } catch (ParseException e) {
+                    int pattern_pos = patternsAdapter.getPosition(ApiStrings.PATTERN_OPTIONS.ONCE);
+                    patternSpinner.setSelection(pattern_pos);
                     e.printStackTrace();
                 }
-                String frequency = rule.getFreq().name();
-                int pattern_pos = patternsAdapter.getPosition(frequency);
-                patternSpinner.setSelection(pattern_pos);
+
+
             } else {
                 int pattern_pos = patternsAdapter.getPosition(ApiStrings.PATTERN_OPTIONS.ONCE);
                 patternSpinner.setSelection(pattern_pos);
@@ -262,6 +328,18 @@ public class AddEditEventActivity extends AppCompatActivity {
         }
 
     }
+
+    AdapterView.OnItemSelectedListener onPatternSelected = new AdapterView.OnItemSelectedListener() {
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            updateUiMap.get(parent.getSelectedItem().toString()).updateUi();
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
+        }
+    };
 
     private String prettifyTimezone(String id) {
         TimeZone d = TimeZone.getTimeZone(id);
@@ -364,14 +442,24 @@ public class AddEditEventActivity extends AppCompatActivity {
         event.setLocation(location);
         event.setStatus(status);
 
+        pattern.setTimezone(timezoneSpinner.getSelectedItem().toString());
+
+//        SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy hh:mm:ss z");
+        //TimeZone timeZone = TimeZone.getTimeZone(pattern.getTimezone());
+//        sdf.setTimeZone(timeZone);
+        long duration = INFINITE;
         Timestamp timestamp;
         try {
             String startsAt = startsAtDay.getText().toString() + " " + startsAtTime.getText().toString() + ":00";
+            String endsAt = startsAtDay.getText().toString() + " " + endsAtTime.getText().toString() + ":00";
             timestamp = Timestamp.valueOf(startsAt);
+            duration = Timestamp.valueOf(endsAt).getTime() - timestamp.getTime();
         } catch (Exception e) {
             Toast.makeText(this, "Invalid date or time", Toast.LENGTH_SHORT).show();
             return;
         }
+        //LocalDateTime time = LocalDateTime.fromDateFields(new Date(timestamp.getTime()));
+        //DateTime zonedDateTime = time.toDateTime(DateTimeZone.forTimeZone(timeZone));
         pattern.setStarted_at(timestamp.getTime());
 
         try {
@@ -381,14 +469,15 @@ public class AddEditEventActivity extends AppCompatActivity {
             Toast.makeText(this, "Invalid date or time", Toast.LENGTH_SHORT).show();
             return;
         }
+        //time = LocalDateTime.fromDateFields(new Date(timestamp.getTime()));
+        //zonedDateTime = time.toDateTime(DateTimeZone.forTimeZone(timeZone));
         pattern.setEnded_at(timestamp.getTime());
-        pattern.setDuration(pattern.getEnded_at() - pattern.getStarted_at());
-
-        pattern.setTimezone(timezoneSpinner.getSelectedItem().toString());
+        pattern.setDuration(duration);
+        //pattern.setDuration(pattern.getEnded_at() - pattern.getStarted_at());
 
         RRule rule = new RRule();
         rule.setWkSt(Weekday.MO);
-        rule.setFreq(Frequency.DAILY);
+        rule.setFreq(frequencyHashMap.get(patternSpinner.getSelectedItem().toString()));
         EditText everyX = findViewById(R.id.every_x);
         int x = Integer.valueOf(everyX.getText().toString());
         rule.setInterval(x);
@@ -396,6 +485,21 @@ public class AddEditEventActivity extends AppCompatActivity {
         x = Integer.valueOf(xTimes.getText().toString());
         rule.setCount(x);
         String stRule = rule.toIcal().substring(6);
+
+        if (rule.getFreq() == Frequency.WEEKLY) {
+            StringBuilder byDay = new StringBuilder(";BYDAY=");
+            Iterator it = weekdayHashMap.entrySet().iterator();
+            while(it.hasNext()) {
+                Map.Entry pair = (Map.Entry)it.next();
+                ToggleButton button = (ToggleButton) pair.getKey();
+                if (button.isChecked()) {
+                    byDay.append(pair.getValue().toString());
+                    byDay.append(",");
+                }
+            }
+            stRule += byDay.substring(0, byDay.length() - 1);
+        }
+
         pattern.setRrule(stRule);
 
         data.putExtra(EXTRA_EVENT, (new Gson()).toJson(event));

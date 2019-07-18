@@ -125,9 +125,13 @@ public class CalendarActivity extends AppCompatActivity {
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                eventViewModel.delete(eventsAdapter.getEventAt(viewHolder.getAdapterPosition()).getEvent());
-                updateAllObservers();
-                Toast.makeText(CalendarActivity.this, R.string.task_was_deleted, Toast.LENGTH_SHORT).show();
+                eventViewModel.delete(eventsAdapter.getEventAt(viewHolder.getAdapterPosition()).getEvent()).observe(CalendarActivity.this, new Observer<Events>() {
+                    @Override
+                    public void onChanged(Events events) {
+                        updateAllObservers();
+                        Toast.makeText(CalendarActivity.this, R.string.task_was_deleted, Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         }).attachToRecyclerView(eventsView);
 

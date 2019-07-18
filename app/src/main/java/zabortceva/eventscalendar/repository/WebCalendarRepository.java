@@ -293,10 +293,8 @@ public class WebCalendarRepository {
                                         eventHashMap.put(event.getId(), event);
                                     }
                                     List<FullEvent> fullEvents = new ArrayList<>(buffer.getValue());
-                                    for (int i = 0; i < fullEvents.size(); ++i) {
-                                        FullEvent fullEvent = fullEvents.get(i);
+                                    for (FullEvent fullEvent : fullEvents) {
                                         fullEvent.setEvent(eventHashMap.get(fullEvent.getInstance().getEvent_id()));
-                                        fullEvents.set(i, fullEvent);
                                     }
                                     buffer.setValue(fullEvents);
                                     patternsApi.getPatternByInterval(startOfDay, endOfDay, idToken).enqueue(new Callback<Patterns>() {
