@@ -15,11 +15,12 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import zabortceva.eventscalendar.localdata.Task;
-import zabortceva.eventscalendar.repository.WebCalendarRepository;
+import zabortceva.eventscalendar.repository.ServerCalendarRepository;
+import zabortceva.eventscalendar.serverdata.Tasks;
 
 public class TaskViewModel extends AndroidViewModel {
-    private WebCalendarRepository repository;
-    private LiveData<List<Task>> allTasks;
+    private ServerCalendarRepository repository;
+    private LiveData<List<Task>> tasksByEventId;
     private LiveData<List<Task>> dayTasks;
     private Date selectedDay;
     private LiveData<List<CalendarDay>> busyDays;
@@ -27,7 +28,7 @@ public class TaskViewModel extends AndroidViewModel {
     public TaskViewModel(Application application) {
         super(application);
 
-        repository = WebCalendarRepository.getInstance();
+        repository = ServerCalendarRepository.getInstance();
         selectedDay = getDay(new Timestamp(System.currentTimeMillis()));
     }
 
@@ -42,14 +43,14 @@ public class TaskViewModel extends AndroidViewModel {
         return day;
     }
 
-    public void insert(Task task) {
-        repository.insertTask(task);
+    public LiveData<Tasks> insert(Task task) {
+        return repository.insertTask(task);
     }
-    public void update(Task task) {
-        repository.updateTask(task);
+    public LiveData<Tasks> update(Task task) {
+        return repository.updateTask(task);
     }
-    public void delete(Task task) {
-        repository.deleteTask(task);
+    public LiveData<Tasks> delete(Task task) {
+        return repository.deleteTask(task);
     }
     public LiveData<List<Task>> getSavedDayTasks() {
         return dayTasks;
@@ -70,5 +71,14 @@ public class TaskViewModel extends AndroidViewModel {
     public LiveData<List<CalendarDay>> getAllBusyDays() {
         busyDays = repository.getAllBusyDays();
         return busyDays;
+    }
+
+    public LiveData<List<Task>> getSavedTasksByEventId() {
+        return tasksByEventId;
+    }
+
+    public LiveData<List<Task>> getTasksByEventId(long id) {
+        tasksByEventId = repository.getTasksByEventId(id);
+        return tasksByEventId;
     }
 }

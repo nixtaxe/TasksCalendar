@@ -7,13 +7,12 @@ import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import zabortceva.eventscalendar.localdata.Permission;
 import zabortceva.eventscalendar.requests.EventsApi;
 import zabortceva.eventscalendar.requests.PatternsApi;
 import zabortceva.eventscalendar.requests.PermissionsApi;
 import zabortceva.eventscalendar.requests.TasksApi;
 
-public abstract class ServerDatabase {
+public abstract class ServerApi {
     private final static String BASE_URL = "http://planner.skillmasters.ga/";
 
     private static Retrofit retrofit;
@@ -25,7 +24,7 @@ public abstract class ServerDatabase {
             .setLenient()
             .create();
 
-    public static synchronized Retrofit getInstance() {
+    private static synchronized Retrofit getInstance() {
         if (retrofit == null) {
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
             // set your desired log level
@@ -45,22 +44,22 @@ public abstract class ServerDatabase {
     }
 
     public static TasksApi getTasksApi() {
-        Retrofit retrofit = ServerDatabase.getInstance();
+        Retrofit retrofit = ServerApi.getInstance();
         return retrofit.create(TasksApi.class);
     }
 
     public static EventsApi getEventsApi() {
-        Retrofit retrofit = ServerDatabase.getInstance();
+        Retrofit retrofit = ServerApi.getInstance();
         return retrofit.create(EventsApi.class);
     }
 
     public static PermissionsApi getPermissionsApi() {
-        Retrofit retrofit = ServerDatabase.getInstance();
+        Retrofit retrofit = ServerApi.getInstance();
         return retrofit.create(PermissionsApi.class);
     }
 
     public static PatternsApi getPatternsApi() {
-        Retrofit retrofit = ServerDatabase.getInstance();
+        Retrofit retrofit = ServerApi.getInstance();
         return retrofit.create(PatternsApi.class);
     }
 }

@@ -77,7 +77,7 @@ public class PermissionsAdapter extends ListAdapter<Permission, PermissionsAdapt
         private void bind(Permission permission) {
             listItemTimeView.setText(new SimpleDateFormat("HH:mm").format(permission.getCreated_at()));
             listItemNameView.setText(permission.getName());
-            listItemUserNameView.setText(permission.getUser_id());
+            //listItemUserNameView.setText(permission.getUser_id());
         }
 
     }

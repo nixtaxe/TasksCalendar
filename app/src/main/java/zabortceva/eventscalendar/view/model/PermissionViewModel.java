@@ -9,16 +9,16 @@ import androidx.lifecycle.LiveData;
 import java.util.List;
 
 import zabortceva.eventscalendar.localdata.Permission;
-import zabortceva.eventscalendar.repository.WebCalendarRepository;
+import zabortceva.eventscalendar.repository.ServerCalendarRepository;
 
 public class PermissionViewModel extends AndroidViewModel {
-    private WebCalendarRepository repository;
+    private ServerCalendarRepository repository;
     private LiveData<List<Permission>> allPermissions;
 
     public PermissionViewModel(@NonNull Application application) {
         super(application);
 
-        repository = WebCalendarRepository.getInstance();
+        repository = ServerCalendarRepository.getInstance();
     }
 
     public LiveData<List<Permission>> getSavedAllPermissions() {
@@ -30,7 +30,7 @@ public class PermissionViewModel extends AndroidViewModel {
         return allPermissions;
     }
 
-    public void insertPermission(String user_id, String entity_type, String action) {
-        repository.insertPermission(user_id, entity_type, action);
+    public LiveData<String> insertPermission(String user_id, String entity_type, String action) {
+        return repository.insertPermission(user_id, entity_type, action);
     }
 }

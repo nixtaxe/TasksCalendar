@@ -1,6 +1,7 @@
 package zabortceva.eventscalendar.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.os.Bundle;
@@ -25,6 +26,7 @@ public class AddEditPermissionActivity extends AppCompatActivity {
     private PermissionViewModel permissionViewModel;
     private FloatingActionButton savePermissionButton;
 
+    public EditText link;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +34,7 @@ public class AddEditPermissionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_edit_permission);
 
         userId = findViewById(R.id.user_id);
+        link = findViewById(R.id.result_string);
 
         entityTypesSpinner = findViewById(R.id.entity_types_spinner);
         final ArrayList<String> entityTypes = new ArrayList<>();
@@ -60,7 +63,13 @@ public class AddEditPermissionActivity extends AppCompatActivity {
                 String user = userId.getText().toString().trim();
                 if (Objects.equals(user,""))
                     user = null;
-                permissionViewModel.insertPermission(user, entityTypesSpinner.getSelectedItem().toString(), actionsSpinner.getSelectedItem().toString());
+                permissionViewModel.insertPermission(user, entityTypesSpinner.getSelectedItem().toString(), actionsSpinner.getSelectedItem().toString()).observe(AddEditPermissionActivity.this, new Observer<String>() {
+                    @Override
+                    public void onChanged(String s) {
+                        if (s != null)
+                            link.setText(s);
+                    }
+                });
             }
         });
     }

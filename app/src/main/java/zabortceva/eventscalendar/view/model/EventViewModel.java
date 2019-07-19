@@ -12,19 +12,19 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import zabortceva.eventscalendar.localdata.Event;
-import zabortceva.eventscalendar.repository.WebCalendarRepository;
+import zabortceva.eventscalendar.repository.ServerCalendarRepository;
 import zabortceva.eventscalendar.serverdata.Events;
 import zabortceva.eventscalendar.serverdata.FullEvent;
 
 public class EventViewModel extends AndroidViewModel {
-    private WebCalendarRepository repository;
+    private ServerCalendarRepository repository;
     private LiveData<List<Event>> allEvents;
     private LiveData<List<FullEvent>> dayFullEvents;
     private LiveData<List<CalendarDay>> allBusyDays;
 
     public EventViewModel(@NonNull Application application) {
         super(application);
-        repository = WebCalendarRepository.getInstance();
+        repository = ServerCalendarRepository.getInstance();
     }
 
     public LiveData<List<Event>> getSavedAllEvents() {return allEvents;}

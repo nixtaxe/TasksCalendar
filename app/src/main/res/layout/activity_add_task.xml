@@ -7,15 +7,6 @@
     android:orientation="vertical"
     tools:context=".activity.AddEditTaskActivity">
 
-    <TextView
-        android:id="@+id/selected_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/task_form"
-        android:layout_centerHorizontal="true"
-        android:hint="Selected date"
-        android:textSize="50sp" />
-
     <LinearLayout
         android:id="@+id/task_form"
         android:layout_width="match_parent"
@@ -23,23 +14,6 @@
         android:orientation="vertical"
         android:padding="16dp"
         android:layout_above="@id/save_task_button">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" Event "
-                android:textSize="20sp"/>
-
-            <Spinner
-                android:id="@+id/events"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
 
 
         <EditText

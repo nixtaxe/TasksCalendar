@@ -22,7 +22,7 @@ public interface TasksApi {
     Call<Tasks> getAllTasks(@Query(ApiStrings.COUNT) int count, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 
     @GET(ApiStrings.TASKS_PATH)
-    Call<Tasks> getEventTasks(@Query(ApiStrings.EVENT_ID) long id, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
+    Call<Tasks> getEventTasks(@Query(ApiStrings.EVENT_ID) Long id, @Header(ApiStrings.X_FIREBASE_AUTH) String idToken);
 
     @Headers({
             ApiStrings.ACCEPT_JSON,

@@ -54,6 +54,9 @@
         <item>Monthly</item>
         <item>Yearly</item>
     </string-array>
+    <string-array name="timezones">
+        <item>(UTC +10:00) Vladivostok</item>
+    </string-array>
     <string name="monday">Mon</string>
     <string name="tuesday">Tue</string>
     <string name="wednesday">Wed</string>
@@ -62,4 +65,8 @@
     <string name="saturday">Sat</string>
     <string name="sunday">Sun</string>
     <string name="event_time">2019-07-17 15:30 — 2019-07-17 16:30</string>
+    <string name="event_name_placeholder">Event: %s</string>
+    <string name="event_details_placeholder">Details: %s</string>
+    <string name="event_status_placeholder">Status: %s</string>
+    <string name="until_placeholder">(Until ?)</string>
 </resources>

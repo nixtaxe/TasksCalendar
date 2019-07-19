@@ -58,7 +58,7 @@ public class EventsAdapter extends ListAdapter<Event, EventsAdapter.EventViewHol
             
             listItemNameView = itemView.findViewById(R.id.event_item_name);
             listItemDetailsView = itemView.findViewById(R.id.event_item_details);
-            listItemLocationView = itemView.findViewById(R.id.event_item_location);
+            listItemLocationView = itemView.findViewById(R.id.event_item_status);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

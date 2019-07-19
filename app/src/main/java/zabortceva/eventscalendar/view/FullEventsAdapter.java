@@ -55,15 +55,19 @@ public class FullEventsAdapter extends ListAdapter<FullEvent, FullEventsAdapter.
     class FullEventViewHolder extends RecyclerView.ViewHolder {
         TextView listItemNameView;
         TextView listItemDetailsView;
-        TextView listItemLocationView;
+        TextView listItemStatusView;
         TextView listItemTimeView;
+
+        String eventNamePlaceholder = "Event: %s";
+        String eventDetailsPlaceholder = "Details: %s";
+        String eventStatusPlaceholder = "Status: %s";
 
         public FullEventViewHolder(View itemView) {
             super(itemView);
 
             listItemNameView = itemView.findViewById(R.id.event_item_name);
             listItemDetailsView = itemView.findViewById(R.id.event_item_details);
-            listItemLocationView = itemView.findViewById(R.id.event_item_location);
+            listItemStatusView = itemView.findViewById(R.id.event_item_status);
             listItemTimeView = itemView.findViewById(R.id.event_item_time);
 
             itemView.setOnClickListener(new View.OnClickListener() {
@@ -81,13 +85,17 @@ public class FullEventsAdapter extends ListAdapter<FullEvent, FullEventsAdapter.
         private void bind(FullEvent fullEvent) {
             Event event = fullEvent.getEvent();
             if (event != null) {
-                listItemNameView.setText("Event: " + String.valueOf(event.getName()));
-                listItemDetailsView.setText("Details: " + event.getDetails());
+                listItemNameView.setText(String.format(eventNamePlaceholder, String.valueOf(event.getName())));
+                listItemDetailsView.setText(String.format(eventDetailsPlaceholder, String.valueOf(event.getDetails())));
                 if (Objects.equals(event.getDetails().trim(), ""))
                     listItemDetailsView.setVisibility(View.GONE);
-                listItemLocationView.setText("Location: " + event.getLocation());
-                if(Objects.equals(event.getLocation().trim(), ""))
-                    listItemLocationView.setVisibility(View.GONE);
+                else
+                    listItemDetailsView.setVisibility(View.VISIBLE);
+                listItemStatusView.setText(String.format(eventStatusPlaceholder, String.valueOf(event.getStatus())));
+                if(Objects.equals(event.getStatus().trim(), ""))
+                    listItemStatusView.setVisibility(View.GONE);
+                else
+                    listItemStatusView.setVisibility(View.VISIBLE);
             }
 
             Instance instance = fullEvent.getInstance();

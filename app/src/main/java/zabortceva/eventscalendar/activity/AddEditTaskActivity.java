@@ -5,6 +5,7 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
@@ -27,16 +28,21 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import zabortceva.eventscalendar.R;
 import zabortceva.eventscalendar.localdata.Event;
+import zabortceva.eventscalendar.localdata.Task;
 import zabortceva.eventscalendar.view.DatePickerFragment;
+import zabortceva.eventscalendar.view.DateTimeString;
 import zabortceva.eventscalendar.view.model.EventViewModel;
 import zabortceva.eventscalendar.view.EventsSpinnerAdapter;
 import zabortceva.eventscalendar.view.TimePickerFragment;
 
 import static zabortceva.eventscalendar.activity.AddEditEventActivity.EXTRA_DAY;
+import static zabortceva.eventscalendar.activity.AddEditEventActivity.EXTRA_EVENT;
 import static zabortceva.eventscalendar.activity.AddEditEventActivity.EXTRA_MONTH;
+import static zabortceva.eventscalendar.activity.AddEditEventActivity.EXTRA_TASK;
 import static zabortceva.eventscalendar.activity.AddEditEventActivity.EXTRA_YEAR;
 
 public class AddEditTaskActivity extends AppCompatActivity {
@@ -62,7 +68,7 @@ public class AddEditTaskActivity extends AppCompatActivity {
     private EditText editTaskDetails;
     private TextView editDeadlineAtDay;
     private TextView editDeadlineAtTime;
-    private TextView selectedDate;
+//    private TextView selectedDate;
     private FloatingActionButton saveTaskButton;
 
     private Calendar c = Calendar.getInstance();
@@ -74,25 +80,22 @@ public class AddEditTaskActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
 
-        //TODO: put all update related stuff in one place
+//        selectedDate = findViewById(R.id.selected_date);
+        Intent intent = getIntent();
+        long timestamp;
+        if (intent.hasExtra(EXTRA_TASK_DEADLINE_AT))
+            timestamp = getIntent().getLongExtra(EXTRA_TASK_DEADLINE_AT, 0);
+        else
+            timestamp = System.currentTimeMillis();
 
-        selectedDate = findViewById(R.id.selected_date);
-        final String timestamp = getIntent().getStringExtra(EXTRA_TASK_DEADLINE_AT);
-        String time = dfTime.format(Timestamp.valueOf(timestamp));
-        String date = dfDay.format(Timestamp.valueOf(timestamp));
-        try {
-            c.setTime(dfDay.parse(date));
-        } catch (ParseException p) {
-            p.printStackTrace();
-        }
-        String mediumDate = DateFormat.getDateInstance(DateFormat.MEDIUM).format(c.getTime());
-        selectedDate.setText(mediumDate);
+//        String mediumDate = DateFormat.getDateInstance(DateFormat.MEDIUM).format(c.getTime());
+//        selectedDate.setText(mediumDate);
 
         editTaskName = findViewById(R.id.edit_task_name);
         editTaskDetails = findViewById(R.id.edit_task_details);
 
         editDeadlineAtDay = findViewById(R.id.edit_deadline_at_day);
-        editDeadlineAtDay.setText(date);
+        editDeadlineAtDay.setText(DateTimeString.getDateString(timestamp));
         editDeadlineAtDay.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -100,6 +103,7 @@ public class AddEditTaskActivity extends AppCompatActivity {
                 DatePickerFragment datePicker = new DatePickerFragment();
 
                 Bundle args = new Bundle();
+                c.setTime(DateTimeString.getDate(editDeadlineAtDay.getText().toString()));
                 args.putInt(EXTRA_YEAR, c.get(Calendar.YEAR));
                 args.putInt(EXTRA_MONTH, c.get(Calendar.MONTH));
                 args.putInt(EXTRA_DAY, c.get(Calendar.DAY_OF_MONTH));
@@ -111,29 +115,22 @@ public class AddEditTaskActivity extends AppCompatActivity {
         });
 
         editDeadlineAtTime = findViewById(R.id.edit_deadline_at_time);
-        editDeadlineAtTime.setText(time);
+        editDeadlineAtTime.setText(DateTimeString.getTimeString(timestamp));
         editDeadlineAtTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 TimePickerFragment timePicker = new TimePickerFragment();
 
-                Timestamp t = Timestamp.valueOf(timestamp);
                 Bundle args = new Bundle();
-                args.putInt(EXTRA_TASK_DEADLINE_HOUR, t.getHours());
-                args.putInt(EXTRA_TASK_DEADLINE_MINUTES, t.getMinutes());
+                c.setTime(DateTimeString.getDate(editDeadlineAtTime.getText().toString()));
+                args.putInt(EXTRA_TASK_DEADLINE_HOUR, c.get(Calendar.HOUR));
+                args.putInt(EXTRA_TASK_DEADLINE_MINUTES, c.get(Calendar.MINUTE));
                 timePicker.setArguments(args);
 
                 timePicker.setCallback(onDeadlineAtTime);
                 timePicker.show(getSupportFragmentManager(), "Deadline at time:");
             }
         });
-
-        final Intent intent = getIntent();
-
-        if (intent.hasExtra(EXTRA_TASK_ID)) {
-            editTaskName.setText(intent.getStringExtra(EXTRA_TASK_NAME));
-            editTaskDetails.setText(intent.getStringExtra(EXTRA_TASK_DETAILS));
-        }
 
         saveTaskButton = findViewById(R.id.save_task_button);
         saveTaskButton.setOnClickListener(new View.OnClickListener() {
@@ -143,59 +140,56 @@ public class AddEditTaskActivity extends AppCompatActivity {
             }
         });
 
-        eventsSpinner = (Spinner) findViewById(R.id.events);
+        if (intent.hasExtra(EXTRA_TASK)) {
+            prepareTaskEdit();
+        }
+    }
 
-        eventViewModel = ViewModelProviders.of(this).get(EventViewModel.class);
-        eventViewModel.getAllEvents().observe(this, new Observer<List<Event>>() {
-            @Override
-            public void onChanged(List<Event> events) {
-                EventsSpinnerAdapter dataAdapter = new EventsSpinnerAdapter(AddEditTaskActivity.this,
-                        android.R.layout.simple_spinner_item, events.toArray(new Event[events.size()]));
-                dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                eventsSpinner.setAdapter(dataAdapter);
-                if (intent.hasExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME)) {
-                    Long event_id = intent.getLongExtra(AddEditTaskActivity.EXTRA_TASK_EVENTS_NAME, -1);
-                    for (Event event : events) {
-                        if (Objects.equals(event.getId(), event_id)) {
-                            int event_pos = dataAdapter.getPosition(event);
-                            eventsSpinner.setSelection(event_pos);
-                        }
-                    }
-                }
-            }
-        });
-
+    private void prepareTaskEdit() {
+        Intent intent = getIntent();
+        Task task = (new Gson()).fromJson(intent.getStringExtra(EXTRA_TASK), Task.class);
+        editTaskName.setText(task.getName());
+        editTaskDetails.setText(task.getDetails());
+        editDeadlineAtDay.setText(DateTimeString.getDateString(task.getDeadline_at()));
+        editDeadlineAtTime.setText(DateTimeString.getTimeString(task.getDeadline_at()));
     }
 
     private void saveTask() {
         String name = editTaskName.getText().toString();
         String details = editTaskDetails.getText().toString();
         String deadline_at = editDeadlineAtDay.getText().toString();
-        long event_id = ((Event) eventsSpinner.getSelectedItem()).getId();
+//        long event_id = ((Event) eventsSpinner.getSelectedItem()).getId();
 
         if (name.trim().isEmpty()) {
             Toast.makeText(this, "Please insert title", Toast.LENGTH_LONG).show();
             return;
         }
 
+        Timestamp deadline = new Timestamp(System.currentTimeMillis());
         try {
             deadline_at += " " + editDeadlineAtTime.getText().toString() + ":00";
-            Timestamp timestamp = Timestamp.valueOf(deadline_at);
+            deadline = Timestamp.valueOf(deadline_at);
         } catch (Exception e) {
             Toast.makeText(this, "Invalid date or time", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        Intent data = new Intent();
-        data.putExtra(EXTRA_TASK_EVENTS_NAME, event_id);
-        data.putExtra(EXTRA_TASK_NAME, name);
-        data.putExtra(EXTRA_TASK_DETAILS, details);
-        data.putExtra(EXTRA_TASK_DEADLINE_AT, deadline_at);
+        Intent intent = getIntent();
+        Task task = new Task();
+        if (intent.hasExtra(EXTRA_TASK))
+            task = (new Gson()).fromJson(intent.getStringExtra(EXTRA_TASK), Task.class);
 
-        long id = getIntent().getLongExtra(EXTRA_TASK_ID, -1);
-        if (id != -1) {
-            data.putExtra(EXTRA_TASK_ID, id);
+        if (intent.hasExtra(EXTRA_EVENT)) {
+            Event event = (new Gson()).fromJson(intent.getStringExtra(EXTRA_EVENT), Event.class);
+            task.setEvent_id(event.getId());
         }
+
+        task.setName(name);
+        task.setDetails(details);
+        task.setDeadline_at(deadline.getTime());
+
+        Intent data = new Intent();
+        data.putExtra(EXTRA_TASK, (new Gson()).toJson(task));
 
         setResult(RESULT_OK, data);
         finish();
@@ -209,7 +203,7 @@ public class AddEditTaskActivity extends AppCompatActivity {
             c.set(Calendar.MONTH, month);
             c.set(Calendar.DAY_OF_MONTH, dayOfMonth);
             String mediumDate = DateFormat.getDateInstance(DateFormat.MEDIUM).format(c.getTime());
-            selectedDate.setText(mediumDate);
+//            selectedDate.setText(mediumDate);
 
             String date = dfDay.format(c.getTime());
             editDeadlineAtDay.setText(date);

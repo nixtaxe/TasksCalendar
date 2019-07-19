@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import java.util.Objects;
 
+import scala.util.parsing.combinator.testing.Str;
 import zabortceva.eventscalendar.R;
 import zabortceva.eventscalendar.localdata.Task;
 
@@ -27,17 +28,12 @@ public class TasksAdapter extends ListAdapter<Task, TasksAdapter.TaskViewHolder>
     private static final DiffUtil.ItemCallback<Task> DIFF_CALLBACK = new DiffUtil.ItemCallback<Task>() {
         @Override
         public boolean areItemsTheSame(@NonNull Task task, @NonNull Task t1) {
-            return task.getId() == t1.getId();
+            return false;
         }
 
         @Override
         public boolean areContentsTheSame(@NonNull Task task, @NonNull Task t1) {
-            return task.getName().equals(t1.getName()) &&
-                    Objects.equals(task.getDetails(), t1.getDetails()) &&
-                    Objects.equals(task.getEvent_id(), t1.getEvent_id()) &&
-                    Objects.equals(task.getParent_id(), t1.getParent_id()) &&
-                    task.getDeadline_at().equals(t1.getDeadline_at()) &&
-                    task.getCreated_at().equals(t1.getCreated_at());
+            return false;
         }
     };
 
@@ -56,15 +52,20 @@ public class TasksAdapter extends ListAdapter<Task, TasksAdapter.TaskViewHolder>
     }
 
     class TaskViewHolder extends RecyclerView.ViewHolder {
-        TextView listItemEventNameView;
+//        TextView listItemEventNameView;
         TextView listItemTimeView;
+        TextView listItemDateView;
         TextView listItemNameView;
         TextView listItemTaskContentView;
+
+        String taskNamePlaceholder = "Task: %s";
+        String taskDetailsPlaceholder = "Details: %s";
 
         public TaskViewHolder(View itemView) {
             super(itemView);
 
-            listItemEventNameView = itemView.findViewById(R.id.event_name);
+//            listItemEventNameView = itemView.findViewById(R.id.event_name);
+            listItemDateView = itemView.findViewById(R.id.task_date);
             listItemTimeView = itemView.findViewById(R.id.task_time);
             listItemNameView = itemView.findViewById(R.id.task_name);
             listItemTaskContentView = itemView.findViewById(R.id.task_content);
@@ -82,11 +83,17 @@ public class TasksAdapter extends ListAdapter<Task, TasksAdapter.TaskViewHolder>
 
         @RequiresApi(api = Build.VERSION_CODES.N)
         private void bind(Task task) {
-            listItemEventNameView.setText(String.valueOf(task.getEvent_id()));
-            listItemTimeView.setText(new SimpleDateFormat("HH:mm").format(task.getDeadline_at()));
-            listItemNameView.setText(task.getName());
-            listItemTaskContentView.setText(task.getDetails());
-        }
+//            listItemEventNameView.setText(String.valueOf(task.getEvent_id()));
+            long deadline = task.getDeadline_at();
+            listItemDateView.setText(DateTimeString.getDateString(deadline));
+            listItemTimeView.setText(DateTimeString.getTimeString(deadline));
+            listItemNameView.setText(String.format(taskNamePlaceholder, task.getName()));
+            listItemTaskContentView.setText(String.format(taskDetailsPlaceholder, task.getDetails()));
+            if (Objects.equals(task.getDetails(), null) || Objects.equals(task.getDetails().trim(), ""))
+                listItemTaskContentView.setVisibility(View.GONE);
+            else
+                listItemTaskContentView.setVisibility(View.VISIBLE);
+            }
 
     }
 

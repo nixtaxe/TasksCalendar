@@ -37,15 +37,11 @@ import com.prolificinteractive.materialcalendarview.spans.DotSpan;
 import zabortceva.eventscalendar.R;
 import zabortceva.eventscalendar.localdata.Event;
 import zabortceva.eventscalendar.localdata.Pattern;
-import zabortceva.eventscalendar.localdata.Task;
-import zabortceva.eventscalendar.repository.WebCalendarRepository;
 import zabortceva.eventscalendar.serverdata.Events;
 import zabortceva.eventscalendar.serverdata.FullEvent;
 import zabortceva.eventscalendar.serverdata.Patterns;
-import zabortceva.eventscalendar.view.EventsAdapter;
 import zabortceva.eventscalendar.view.FullEventsAdapter;
 import zabortceva.eventscalendar.view.model.EventViewModel;
-import zabortceva.eventscalendar.view.TasksAdapter;
 import zabortceva.eventscalendar.view.model.PatternViewModel;
 
 import static zabortceva.eventscalendar.activity.AddEditEventActivity.EXTRA_EVENT;

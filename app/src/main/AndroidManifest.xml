@@ -23,13 +23,10 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.AddEditTaskActivity"
-            android:parentActivityName=".activity.CalendarActivity" />
-        <activity
-            android:name=".activity.EventsActivity"
-            android:parentActivityName=".activity.CalendarActivity" />
+            android:parentActivityName=".activity.AddEditEventActivity" />
         <activity
             android:name=".activity.AddEditEventActivity"
-            android:parentActivityName=".activity.EventsActivity" />
+            android:parentActivityName=".activity.CalendarActivity" />
         <activity android:name=".activity.LoginActivity"
             android:parentActivityName=".activity.CalendarActivity"/>
         <activity

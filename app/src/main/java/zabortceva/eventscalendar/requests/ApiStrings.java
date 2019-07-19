@@ -55,7 +55,7 @@ public interface ApiStrings {
         public static final String YEARLY = "YEARLY";
     }
 
-    public static final String[] WEEKDAYS = {"MO", "TU", "WE", "TH", "FR", "SA", "SU"};
+    public static final String[] WEEKDAYS = {"SU", "MO", "TU", "WE", "TH", "FR", "SA"};
     public interface WEEKDAY_OPTIONS {
         public static final String MONDAY = "MO";
         public static final String TUESDAY = "TU";

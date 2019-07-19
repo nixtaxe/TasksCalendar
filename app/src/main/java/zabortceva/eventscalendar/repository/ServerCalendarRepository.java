@@ -4,11 +4,9 @@ import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -29,7 +27,6 @@ import androidx.lifecycle.MutableLiveData;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 import scala.util.parsing.combinator.testing.Str;
 import zabortceva.eventscalendar.localdata.Event;
 import zabortceva.eventscalendar.localdata.Pattern;
@@ -45,12 +42,12 @@ import zabortceva.eventscalendar.serverdata.Instance;
 import zabortceva.eventscalendar.serverdata.Instances;
 import zabortceva.eventscalendar.serverdata.Patterns;
 import zabortceva.eventscalendar.serverdata.Permissions;
-import zabortceva.eventscalendar.serverdata.ServerDatabase;
+import zabortceva.eventscalendar.serverdata.ServerApi;
 import zabortceva.eventscalendar.serverdata.Tasks;
 import zabortceva.eventscalendar.serverdata.User;
 
-public class WebCalendarRepository {
-    private static WebCalendarRepository repository;
+public class ServerCalendarRepository {
+    private static ServerCalendarRepository repository;
     private FirebaseAuth auth;
 
     private TasksApi tasksApi;
@@ -58,18 +55,18 @@ public class WebCalendarRepository {
     private PermissionsApi permissionsApi;
     private PatternsApi patternsApi;
 
-    private WebCalendarRepository() {
-        tasksApi = ServerDatabase.getTasksApi();
-        eventsApi = ServerDatabase.getEventsApi();
-        permissionsApi = ServerDatabase.getPermissionsApi();
-        patternsApi = ServerDatabase.getPatternsApi();
+    private ServerCalendarRepository() {
+        tasksApi = ServerApi.getTasksApi();
+        eventsApi = ServerApi.getEventsApi();
+        permissionsApi = ServerApi.getPermissionsApi();
+        patternsApi = ServerApi.getPatternsApi();
         
         auth = FirebaseAuth.getInstance();
     }
 
-    public static synchronized WebCalendarRepository getInstance() {
+    public static synchronized ServerCalendarRepository getInstance() {
         if (repository == null) {
-            repository = new WebCalendarRepository();
+            repository = new ServerCalendarRepository();
         }
 
         return repository;
@@ -345,6 +342,43 @@ public class WebCalendarRepository {
         return data;
     }
 
+    public LiveData<List<Task>> getTasksByEventId(final long id) {
+        final MutableLiveData<List<Task>> data = new MutableLiveData<>();
+
+        auth.getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+            @Override
+            public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
+                String idToken = task.getResult().getToken();
+                tasksApi.getEventTasks(id, idToken).enqueue(new Callback<Tasks>() {
+                    @Override
+                    public void onResponse(Call<Tasks> call, Response<Tasks> response) {
+                        if (response.body() != null) {
+                            List<Task> dayTasks = Arrays.asList(response.body().getData());
+                            Collections.sort(dayTasks, new Comparator<Task>() {
+                                @Override
+                                public int compare(Task lhs, Task rhs) {
+                                    // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+                                    return lhs.getDeadline_at() < rhs.getDeadline_at() ? -1 : (lhs.getDeadline_at() > rhs.getDeadline_at()) ? 1 : 0;
+                                }
+                            });
+                            data.setValue(dayTasks);
+                            Log.v("GetDayTasks", String.valueOf(response.code()));
+                        } else {
+                            Log.wtf("GetDayTasks", String.valueOf(response.code()));
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Tasks> call, Throwable t) {
+                        t.printStackTrace();
+                    }
+                });
+            }
+        });
+
+        return data;
+    }
+
     public LiveData<List<Task>> getDayTasks(Timestamp timestamp) {
         DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
         Date day = new Date();
@@ -605,7 +639,8 @@ public class WebCalendarRepository {
         return data;
     }
 
-    public void insertPermission(final String user_id, final String entity_type, final String action) {
+    public LiveData<String> insertPermission(final String user_id, final String entity_type, final String action) {
+        final MutableLiveData<String> data = new MutableLiveData<>();
         auth.getCurrentUser().getIdToken(false).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
             public void onComplete(@NonNull com.google.android.gms.tasks.Task<GetTokenResult> task) {
@@ -614,7 +649,8 @@ public class WebCalendarRepository {
                     permissionsApi.shareOne(null, entity_type, action, idToken).enqueue(new Callback<String>() {
                         @Override
                         public void onResponse(Call<String> call, Response<String> response) {
-
+                            if (response.isSuccessful())
+                                data.setValue(response.body());
                         }
 
                         @Override
@@ -648,6 +684,7 @@ public class WebCalendarRepository {
                 }
             }
         });
+        return data;
     }
 
     public LiveData<Pattern> getPatternById(final long id) {
