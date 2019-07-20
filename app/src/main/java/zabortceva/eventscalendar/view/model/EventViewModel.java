@@ -32,7 +32,7 @@ public class EventViewModel extends AndroidViewModel {
 
     public EventViewModel(@NonNull Application application) {
         super(application);
-        repository = ServerCalendarRepository.getInstance(application);
+        repository = ServerCalendarRepository.getInstance();
     }
 
     public LiveData<List<FullEvent>> getSavedMonthFullEvents() {

@@ -18,7 +18,7 @@ public class PermissionViewModel extends AndroidViewModel {
     public PermissionViewModel(@NonNull Application application) {
         super(application);
 
-        repository = ServerCalendarRepository.getInstance(application);
+        repository = ServerCalendarRepository.getInstance();
     }
 
     public LiveData<List<Permission>> getSavedAllPermissions() {

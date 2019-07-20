@@ -61,8 +61,8 @@ public class ServerCalendarRepository {
     private PermissionsApi permissionsApi;
     private PatternsApi patternsApi;
 
-    private ServerCalendarRepository(Context context) {
-        serverApi = ServerApi.getInstance(context);
+    private ServerCalendarRepository() {
+        serverApi = ServerApi.getInstance();
         tasksApi = serverApi.getTasksApi();
         eventsApi = serverApi.getEventsApi();
         permissionsApi = serverApi.getPermissionsApi();
@@ -71,9 +71,9 @@ public class ServerCalendarRepository {
         auth = FirebaseAuth.getInstance();
     }
 
-    public static synchronized ServerCalendarRepository getInstance(Context context) {
+    public static synchronized ServerCalendarRepository getInstance() {
         if (repository == null) {
-            repository = new ServerCalendarRepository(context);
+            repository = new ServerCalendarRepository();
         }
 
         return repository;

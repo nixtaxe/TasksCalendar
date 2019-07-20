@@ -43,7 +43,7 @@ public class ServerApi {
             .setLenient()
             .create();
 
-    private ServerApi(final Context context) {
+    private ServerApi() {
         Cache myCache = new Cache(new File(CalendarApplication.getInstance().getCacheDir(), "requests"), cacheSize);
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         // set your desired log level
@@ -105,21 +105,12 @@ public class ServerApi {
                 .build();
     }
 
-    public static synchronized ServerApi getInstance(final Context context) {
+    public static synchronized ServerApi getInstance() {
         if (instance == null) {
-            instance = new ServerApi(context);
+            instance = new ServerApi();
         }
 
         return instance;
-    }
-
-    private static Boolean hasNetwork(Context context) {
-        Boolean isConnected = false;
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-        if (activeNetwork != null && activeNetwork.isConnected())
-            isConnected = true;
-        return isConnected;
     }
 
     public TasksApi getTasksApi() {

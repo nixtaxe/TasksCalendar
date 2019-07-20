@@ -28,7 +28,7 @@ public class TaskViewModel extends AndroidViewModel {
     public TaskViewModel(Application application) {
         super(application);
 
-        repository = ServerCalendarRepository.getInstance(application);
+        repository = ServerCalendarRepository.getInstance();
         selectedDay = getDay(new Timestamp(System.currentTimeMillis()));
     }
 
