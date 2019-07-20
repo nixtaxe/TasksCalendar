@@ -4,18 +4,30 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 
 import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.alamkanak.weekview.MonthChangeListener;
+import com.alamkanak.weekview.Period;
+import com.alamkanak.weekview.WeekView;
+import com.alamkanak.weekview.WeekViewDisplayable;
+import com.alamkanak.weekview.WeekViewEvent;
+import com.alamkanak.weekview.WeekViewLoader;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.ItemTouchHelper;
+
+import android.util.Pair;
 import android.view.View;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -23,6 +35,8 @@ import java.util.List;
 
 import androidx.lifecycle.ViewModelProviders;
 
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,13 +46,16 @@ import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
+import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 import com.prolificinteractive.materialcalendarview.spans.DotSpan;
 
 import zabortceva.eventscalendar.R;
 import zabortceva.eventscalendar.localdata.Event;
 import zabortceva.eventscalendar.localdata.Pattern;
+import zabortceva.eventscalendar.repository.DateRangeHelper;
 import zabortceva.eventscalendar.serverdata.Events;
 import zabortceva.eventscalendar.serverdata.FullEvent;
+import zabortceva.eventscalendar.serverdata.Instance;
 import zabortceva.eventscalendar.serverdata.Patterns;
 import zabortceva.eventscalendar.view.FullEventsAdapter;
 import zabortceva.eventscalendar.view.model.EventViewModel;
@@ -60,8 +77,10 @@ public class CalendarActivity extends AppCompatActivity {
     private FloatingActionButton viewAccountButton;
     final FullEventsAdapter eventsAdapter = new FullEventsAdapter();
     private Observer<List<FullEvent>> dayEventsObserver;
-    private Observer<List<CalendarDay>> busyDaysObserver;
+//    private Observer<List<CalendarDay>> busyDaysObserver;
+    private Observer<List<FullEvent>> monthEventsObserver;
     private EventDecorator busyDaysDecorator = new EventDecorator(0, new ArrayList<CalendarDay>());
+    private List<FullEvent> monthEvents = new ArrayList<>();
 
     private EventViewModel eventViewModel;
     private PatternViewModel patternViewModel;
@@ -72,6 +91,14 @@ public class CalendarActivity extends AppCompatActivity {
         setContentView(R.layout.calendar_layout);
         eventViewModel = ViewModelProviders.of(this).get(EventViewModel.class);
         patternViewModel = ViewModelProviders.of(this).get(PatternViewModel.class);
+
+//        final WeekView<FullEvent> weekView = findViewById(R.id.weekView);
+//        weekView.setMonthChangeListener(new MonthChangeListener<FullEvent>() {
+//            @Override
+//            public List<WeekViewDisplayable<FullEvent>> onMonthChange(Calendar calendar, Calendar calendar1) {
+//                return new ArrayList<>();
+//            }
+//        });
 
         viewAccountButton = findViewById(R.id.view_account_button);
         viewAccountButton.setOnClickListener(new View.OnClickListener() {
@@ -91,25 +118,35 @@ public class CalendarActivity extends AppCompatActivity {
 
         dayEventsObserver = new Observer<List<FullEvent>>() {
             @Override
-            public void onChanged(List<FullEvent> events) {
+            public void onChanged(final List<FullEvent> events) {
                 eventsAdapter.submitList(events);
+//                weekView.setMonthChangeListener(new MonthChangeListener<FullEvent>() {
+//                    @Override
+//                    public List<WeekViewDisplayable<FullEvent>> onMonthChange(Calendar calendar, Calendar calendar1) {
+//                        List<WeekViewDisplayable<FullEvent>> list = new ArrayList<>();
+//                        list.addAll(events);
+//                        return list;
+//                    }
+//                });
             }
         };
-        observeNewDay(new Timestamp(System.currentTimeMillis()));
+        //observeNewDay(new Timestamp(System.currentTimeMillis()));
 
-        busyDaysObserver = new Observer<List<CalendarDay>>() {
+        monthEventsObserver = new Observer<List<FullEvent>>() {
             @Override
-            public void onChanged(List<CalendarDay> busyDays) {
-                HashSet<CalendarDay> newDays = new HashSet<CalendarDay>(busyDays);
-                if (busyDaysDecorator.getDates().equals(newDays))
+            public void onChanged(List<FullEvent> fullEvents) {
+                monthEvents = fullEvents;
+                HashSet<CalendarDay> busyDays = new HashSet<>();
+                for(FullEvent fullEvent : fullEvents)
+                    busyDays.add(new CalendarDay(new Date(fullEvent.getInstance().getStarted_at())));
+                if (busyDaysDecorator.getDates().equals(busyDays))
                     return;
 
                 calendarView.removeDecorator(busyDaysDecorator);
-                busyDaysDecorator.setDates(newDays);
+                busyDaysDecorator.setDates(busyDays);
                 calendarView.addDecorator(busyDaysDecorator);
             }
         };
-        eventViewModel.getAllBusyDays().observe(this, busyDaysObserver);
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -150,11 +187,28 @@ public class CalendarActivity extends AppCompatActivity {
         calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView materialCalendarView, @NonNull CalendarDay calendarDay, boolean b) {
-                //Mind the localtime in sql query
-                observeNewDay(new Timestamp(calendarDay.getDate().getTime()));
+                List<FullEvent> dayEvents = new ArrayList<>();
+                Date day = calendarDay.getDate();
+                Pair<Date, Date> dayRange = DateRangeHelper.getDayDateRange(day);
+                long startOfDay = dayRange.first.getTime(), endOfDay = dayRange.second.getTime();
+                for (FullEvent fullEvent : monthEvents) {
+                    Instance instance = fullEvent.getInstance();
+                    if (instance.getStarted_at() >= startOfDay && instance.getStarted_at() <= endOfDay ||
+                    instance.getEnded_at() >= startOfDay && instance.getEnded_at() <= endOfDay)
+                        dayEvents.add(fullEvent);
+                }
+                eventsAdapter.submitList(dayEvents);
+            }
+        });
+        calendarView.setOnMonthChangedListener(new OnMonthChangedListener() {
+            @Override
+            public void onMonthChanged(MaterialCalendarView widget, CalendarDay date) {
+                Pair<Date, Date> monthRange = DateRangeHelper.getDateRange(date.getDate());
+                observeNewMonth(monthRange.first, monthRange.second);
             }
         });
         calendarView.setSelectedDate(new Date(System.currentTimeMillis()));
+        updateAllObservers();
 
         addEventButton = findViewById(R.id.add_button);
         addEventButton.setOnClickListener(new View.OnClickListener() {
@@ -171,8 +225,16 @@ public class CalendarActivity extends AppCompatActivity {
     }
 
     private void updateAllObservers() {
-        observeNewDay(new Timestamp(calendarView.getSelectedDate().getDate().getTime()));
-        observeBusyDays();
+        Pair<Date, Date> dateRange = DateRangeHelper.getDateRange(calendarView.getSelectedDate().getDate());
+        observeNewMonth(dateRange.first, dateRange.second);
+    }
+
+    private void observeNewMonth(Date start, Date end) {
+        LiveData<List<FullEvent>> monthEvents = eventViewModel.getSavedMonthFullEvents();
+        if (monthEvents != null && monthEvents.hasObservers())
+            monthEvents.removeObserver(monthEventsObserver);
+
+        eventViewModel.getMonthFullEvents(start, end).observe(this, monthEventsObserver);
     }
 
     private void observeNewDay(Timestamp timestamp) {
@@ -182,27 +244,6 @@ public class CalendarActivity extends AppCompatActivity {
 
         eventViewModel.getDayFullEvents(timestamp).observe(this, dayEventsObserver);
     }
-
-    private void observeBusyDays() {
-        LiveData<List<CalendarDay>> allBusyDays = eventViewModel.getSavedAllBusyDays();
-        if (allBusyDays != null && allBusyDays.hasObservers())
-            allBusyDays.removeObserver(busyDaysObserver);
-
-        eventViewModel.getAllBusyDays().observe(this, busyDaysObserver);
-    }
-
-    Observer<Events> responseObserver = new Observer<Events>() {
-        @Override
-        public void onChanged(Events response) {
-            if (response.isSuccess()) {
-
-                Toast.makeText(CalendarActivity.this, R.string.event_was_saved, Toast.LENGTH_SHORT).show();
-                updateAllObservers();
-            }
-            else
-                Toast.makeText(CalendarActivity.this, R.string.changes_was_not_saved, Toast.LENGTH_SHORT).show();
-        }
-    };
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

@@ -543,7 +543,6 @@ public class AddEditEventActivity extends AppCompatActivity {
     private void saveEvent() {
         String name = editEventName.getText().toString();
         String details = editEventDetails.getText().toString();
-//        String location = editEventLocation.getText().toString();
         String status = editEventStatus.getText().toString();
 
         if (name.trim().isEmpty()) {
@@ -564,7 +563,6 @@ public class AddEditEventActivity extends AppCompatActivity {
 
         event.setName(name);
         event.setDetails(details);
-//        event.setLocation(location);
         event.setStatus(status);
 
         pattern.setTimezone(timezoneSpinner.getSelectedItem().toString());
@@ -589,24 +587,25 @@ public class AddEditEventActivity extends AppCompatActivity {
             Toast.makeText(this, "Invalid date or time", Toast.LENGTH_SHORT).show();
             return;
         }
-        //time = LocalDateTime.fromDateFields(new Date(timestamp.getTime()));
-        //zonedDateTime = time.toDateTime(DateTimeZone.forTimeZone(timeZone));
+
         long duration = end.getTime() - start.getTime();
         if (duration < 0) {
             Toast.makeText(this, "Invalid period", Toast.LENGTH_SHORT).show();
             return;
         }
         pattern.setDuration(duration);
-        //pattern.setDuration(pattern.getEnded_at() - pattern.getStarted_at());
 
         RRule rule = new RRule();
-//        rule.setWkSt(Weekday.MO);
-        rule.setFreq(frequencyHashMap.get(patternSpinner.getSelectedItem().toString()));
+        String selectedFrequency = patternSpinner.getSelectedItem().toString();
+        if (frequencyHashMap.get(selectedFrequency) != null)
+            rule.setFreq(frequencyHashMap.get(selectedFrequency));
         EditText everyX = findViewById(R.id.every_x);
         int x = Integer.valueOf(everyX.getText().toString());
         rule.setInterval(x);
         EditText xTimes = findViewById(R.id.x_times);
         x = Integer.valueOf(xTimes.getText().toString());
+        if (frequencyHashMap.get(selectedFrequency) == null)
+            x = 0;
         rule.setCount(x);
 
         calendar.setTimeZone(TimeZone.getTimeZone(pattern.getTimezone()));
@@ -627,6 +626,7 @@ public class AddEditEventActivity extends AppCompatActivity {
             default:
                 break;
         }
+        calendar.add(Calendar.MILLISECOND, (int)duration);
         pattern.setEnded_at(calendar.getTime().getTime());
         String stRule = rule.toIcal().substring(6);
 

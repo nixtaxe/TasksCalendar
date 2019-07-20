@@ -90,6 +90,8 @@ dependencies {
     // https://mvnrepository.com/artifact/org.dmfs/lib-recur
     implementation group: 'org.dmfs', name: 'lib-recur', version: '0.10.2'
 
+    implementation 'com.github.thellmund:Android-Week-View:3.4.2'
+
     //multidex
     implementation 'androidx.multidex:multidex:2.0.1'
 }

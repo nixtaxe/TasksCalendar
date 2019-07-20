@@ -1,9 +1,15 @@
 package zabortceva.eventscalendar.localdata;
 
+import android.graphics.Color;
+
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.alamkanak.weekview.WeekViewDisplayable;
+import com.alamkanak.weekview.WeekViewEvent;
 import com.google.gson.annotations.Expose;
+
+import java.util.Calendar;
 
 @Entity(tableName = "event_table")
 public class Event {

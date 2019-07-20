@@ -1,6 +1,8 @@
 package zabortceva.eventscalendar.repository;
 
+import android.content.Context;
 import android.util.Log;
+import android.util.Pair;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,6 +29,7 @@ import androidx.lifecycle.MutableLiveData;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
 import scala.util.parsing.combinator.testing.Str;
 import zabortceva.eventscalendar.localdata.Event;
 import zabortceva.eventscalendar.localdata.Pattern;
@@ -47,26 +50,30 @@ import zabortceva.eventscalendar.serverdata.Tasks;
 import zabortceva.eventscalendar.serverdata.User;
 
 public class ServerCalendarRepository {
+    public static final String TAG = "ServerCalendar";
+
     private static ServerCalendarRepository repository;
     private FirebaseAuth auth;
+    private ServerApi serverApi;
 
     private TasksApi tasksApi;
     private EventsApi eventsApi;
     private PermissionsApi permissionsApi;
     private PatternsApi patternsApi;
 
-    private ServerCalendarRepository() {
-        tasksApi = ServerApi.getTasksApi();
-        eventsApi = ServerApi.getEventsApi();
-        permissionsApi = ServerApi.getPermissionsApi();
-        patternsApi = ServerApi.getPatternsApi();
+    private ServerCalendarRepository(Context context) {
+        serverApi = ServerApi.getInstance(context);
+        tasksApi = serverApi.getTasksApi();
+        eventsApi = serverApi.getEventsApi();
+        permissionsApi = serverApi.getPermissionsApi();
+        patternsApi = serverApi.getPatternsApi();
         
         auth = FirebaseAuth.getInstance();
     }
 
-    public static synchronized ServerCalendarRepository getInstance() {
+    public static synchronized ServerCalendarRepository getInstance(Context context) {
         if (repository == null) {
-            repository = new ServerCalendarRepository();
+            repository = new ServerCalendarRepository(context);
         }
 
         return repository;
@@ -186,20 +193,8 @@ public class ServerCalendarRepository {
     }
 
     public LiveData<List<Event>> getDayEvents(final Timestamp timestamp) {
-        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-        Date day = new Date();
-        try {
-            day = formatter.parse(formatter.format(timestamp));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        final Calendar calendar = Calendar.getInstance();
-        calendar.setTime(day);
-        final long startOfDay = calendar.getTimeInMillis();
-        calendar.add(Calendar.DAY_OF_YEAR, 1);
-        calendar.add(Calendar.SECOND, -1);
-        final long endOfDay = calendar.getTimeInMillis();
+        Pair<Date, Date> dayRange = DateRangeHelper.getDayDateRange(new Date(timestamp.getTime()));
+        final long startOfDay = dayRange.first.getTime(), endOfDay = dayRange.second.getTime();
 
         final MutableLiveData<List<Event>> data = new MutableLiveData<>();
 
@@ -237,21 +232,8 @@ public class ServerCalendarRepository {
         return data;
     }
 
-    public LiveData<List<FullEvent>> getDayFullEvents(final Timestamp timestamp) {
-        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-        Date day = new Date();
-        try {
-            day = formatter.parse(formatter.format(timestamp));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        final Calendar calendar = Calendar.getInstance();
-        calendar.setTime(day);
-        final long startOfDay = calendar.getTimeInMillis();
-        calendar.add(Calendar.DAY_OF_YEAR, 1);
-        calendar.add(Calendar.SECOND, -1);
-        final long endOfDay = calendar.getTimeInMillis();
+    public LiveData<List<FullEvent>> getMonthFullEvents(final Date start, final Date end) {
+        final long startOfDay = start.getTime(), endOfDay = end.getTime();
 
         final MutableLiveData<List<FullEvent>> data = new MutableLiveData<>();
 
@@ -262,6 +244,18 @@ public class ServerCalendarRepository {
                 eventsApi.getInstances(startOfDay, endOfDay, idToken).enqueue(new Callback<Instances>() {
                     @Override
                     public void onResponse(Call<Instances> call, Response<Instances> response) {
+
+                        Log.e(TAG, "log: -----------------------------");
+                        Log.d(TAG, "onResponse: " + response.body());
+
+                        if(response.raw().networkResponse() != null){
+                            Log.d(TAG, "onResponse: response is from NETWORK...");
+                        }
+                        else if(response.raw().cacheResponse() != null
+                                && response.raw().networkResponse() == null){
+                            Log.d(TAG, "onResponse: response is from CACHE...");
+                        }
+
                         if (response.body() != null) {
                             List<Instance> list = Arrays.asList(response.body().getData());
                             Collections.sort(list, new Comparator<Instance>() {
@@ -325,9 +319,9 @@ public class ServerCalendarRepository {
                             });
 
 //                            data.setValue(fullEvents);
-                            Log.v("GetDayFullEvents", String.valueOf(response.code()));
+                            Log.v("GetMonthFullEvents", String.valueOf(response.code()));
                         } else {
-                            Log.e("GetDayFullEvents", String.valueOf(response.code()));
+                            Log.e("GetMonthFullEvents", String.valueOf(response.code()));
                         }
                     }
 

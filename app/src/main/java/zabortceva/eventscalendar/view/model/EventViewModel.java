@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import zabortceva.eventscalendar.localdata.Event;
@@ -20,11 +21,27 @@ public class EventViewModel extends AndroidViewModel {
     private ServerCalendarRepository repository;
     private LiveData<List<Event>> allEvents;
     private LiveData<List<FullEvent>> dayFullEvents;
+    private LiveData<List<FullEvent>> monthFullEvents;
     private LiveData<List<CalendarDay>> allBusyDays;
+
+    private Date selectedDate;
+
+    private Date getSelectedDate() {
+        return selectedDate;
+    }
 
     public EventViewModel(@NonNull Application application) {
         super(application);
-        repository = ServerCalendarRepository.getInstance();
+        repository = ServerCalendarRepository.getInstance(application);
+    }
+
+    public LiveData<List<FullEvent>> getSavedMonthFullEvents() {
+        return monthFullEvents;
+    }
+
+    public LiveData<List<FullEvent>> getMonthFullEvents(Date start, Date end) {
+        monthFullEvents = repository.getMonthFullEvents(start, end);
+        return monthFullEvents;
     }
 
     public LiveData<List<Event>> getSavedAllEvents() {return allEvents;}
@@ -34,7 +51,7 @@ public class EventViewModel extends AndroidViewModel {
     }
     public LiveData<List<FullEvent>> getSavedDayFullEvents() {return dayFullEvents;};
     public LiveData<List<FullEvent>> getDayFullEvents(Timestamp timestamp) {
-        dayFullEvents = repository.getDayFullEvents(timestamp);
+//        dayFullEvents = repository.getDayFullEvents(timestamp);
         return dayFullEvents;
     }
     public LiveData<Events> insert(Event event) {

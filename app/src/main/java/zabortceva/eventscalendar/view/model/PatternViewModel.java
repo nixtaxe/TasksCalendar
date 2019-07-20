@@ -20,7 +20,7 @@ public class PatternViewModel extends AndroidViewModel {
     public PatternViewModel(@NonNull Application application) {
         super(application);
 
-        repository = ServerCalendarRepository.getInstance();
+        repository = ServerCalendarRepository.getInstance(application);
     }
 
     public LiveData<Patterns> insert(long event_id, Pattern pattern) {

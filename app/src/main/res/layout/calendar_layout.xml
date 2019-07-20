@@ -7,6 +7,25 @@
     android:layout_height="match_parent"
     >
 
+    <!--<com.alamkanak.weekview.WeekView-->
+        <!--android:id="@+id/weekView"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--app:defaultEventColor="@color/colorPrimary"-->
+        <!--app:eventTextColor="@color/cardview_light_background"-->
+        <!--app:timeColumnTextSize="12sp"-->
+        <!--app:hourHeight="60dp"-->
+        <!--app:timeColumnPadding="8dp"-->
+        <!--app:timeColumnTextColor="@color/fui_linkColor"-->
+        <!--app:timeColumnBackgroundColor="@color/cardview_light_background"-->
+        <!--app:headerRowPadding="12dp"-->
+        <!--app:columnGap="8dp"-->
+        <!--app:numberOfVisibleDays="1"-->
+        <!--app:headerRowBackgroundColor="@color/cardview_shadow_start_color"-->
+        <!--app:dayBackgroundColor="@color/cardview_light_background"-->
+        <!--app:todayBackgroundColor="@color/background_today"-->
+        <!--android:layout_above="@+id/calendar_view"/>-->
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list_view"
         android:layout_width="match_parent"
