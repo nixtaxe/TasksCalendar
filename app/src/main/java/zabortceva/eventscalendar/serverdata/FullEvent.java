@@ -44,16 +44,16 @@ public class FullEvent implements WeekViewDisplayable<FullEvent> {
 
     @Override
     public WeekViewEvent<FullEvent> toWeekViewEvent() {
-        int backgroundColor = Color.WHITE;
+        int backgroundColor = Color.RED;
         int textColor = Color.WHITE;
         int borderWidth = 4;
 
         WeekViewEvent.Style style = new  WeekViewEvent.Style.Builder()
-                .setTextColor(textColor)
-                .setBackgroundColor(backgroundColor)
+//                .setTextColor(textColor)
+//                .setBackgroundColor(backgroundColor)
                 .setTextStrikeThrough(false)
                 .setBorderWidth(borderWidth)
-                .setBorderColor(Color.WHITE)
+//                .setBorderColor(Color.BLUE)
                 .build();
 
         Calendar startTime = Calendar.getInstance();

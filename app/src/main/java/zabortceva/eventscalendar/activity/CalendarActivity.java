@@ -92,13 +92,15 @@ public class CalendarActivity extends AppCompatActivity {
         eventViewModel = ViewModelProviders.of(this).get(EventViewModel.class);
         patternViewModel = ViewModelProviders.of(this).get(PatternViewModel.class);
 
-//        final WeekView<FullEvent> weekView = findViewById(R.id.weekView);
-//        weekView.setMonthChangeListener(new MonthChangeListener<FullEvent>() {
-//            @Override
-//            public List<WeekViewDisplayable<FullEvent>> onMonthChange(Calendar calendar, Calendar calendar1) {
-//                return new ArrayList<>();
-//            }
-//        });
+        final WeekView<FullEvent> weekView = findViewById(R.id.weekView);
+        weekView.setMonthChangeListener(new MonthChangeListener<FullEvent>() {
+            @Override
+            public List<WeekViewDisplayable<FullEvent>> onMonthChange(Calendar calendar, Calendar calendar1) {
+                List<WeekViewDisplayable<FullEvent>> list = new ArrayList<>();
+                list.addAll(monthEvents);
+                return list;
+            }
+        });
 
         viewAccountButton = findViewById(R.id.view_account_button);
         viewAccountButton.setOnClickListener(new View.OnClickListener() {
